@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book My Salon - Home</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        /*
+         * NOTE: These styles are specific to the frontpage layout.
+         * For better organization, consider moving them to a 'frontpage.css' file
+         * or a dedicated section in global.css if they are not reused.
+         */
+
+        /* Hero Specific Styles */
+        .hero-quote-section {
+            position: relative;
+            text-align: center;
+            color: white; /* Default text color over the image */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            min-height: 450px; /* Minimum height for the hero section */
+            padding: 2rem; /* Add some padding around content */
+        }
+
+        .hero-quote-section .hero-image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Dark overlay for text readability */
+            z-index: 1;
+        }
+
+        .hero-quote-section img.hero-background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the entire section */
+            z-index: 0;
+        }
+
+        .hero-quote-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            z-index: 2; /* Ensure text is above overlay */
+            position: relative; /* Ensure text respects z-index */
+        }
+        .hero-quote-section p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* Book Now Button Style */
+        .quote-cta {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: var(--primary-color); /* Use primary color from global.css */
+            color: var(--button-text); /* White text on buttons from global.css */
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: var(--border-radius); /* Use variable from global.css */
+            transition: background-color 0.3s ease;
+            z-index: 2;
+            position: relative;
+        }
+        .quote-cta:hover {
+            background-color: var(--primary-color-dark); /* Darker primary for hover */
+        }
+
+        /* Services Grid Layout */
+        .all-services-section {
+            padding: 2rem;
+            text-align: center;
+        }
+        .all-services-section h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .service-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        .service-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .service-card h3 {
+            font-size: 1.25rem;
+            margin: 1rem 0 0.5rem;
+            color: var(--primary-color);
+        }
+        .service-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            padding: 0 1rem 1rem;
+        }
+
+        /* Responsive adjustments for frontpage specific content */
+        @media (max-width: 768px) {
+            .hero-quote-section h1 {
+                font-size: 2.2rem;
+            }
+            .hero-quote-section p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <a href="frontpage.html" class="logo">Book My Salon</a>
+
+        <div class="header-controls">
+            <div class="header-actions">
+                <a href="salon-register.html" class="btn btn-partner">Register as Partner</a>
+                <div class="auth-buttons">
+                    <a href="login.html" class="btn btn-login">Login</a>
+                    <a href="userinfo.html" class="btn btn-signup">Sign Up</a>
+                </div>
+                <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-quote-section">
+            <img src="images/style-pamper-glow.png" alt="Style, Pamper, Glow - Welcome to Book My Salon" class="hero-background-image">
+            <div class="hero-image-overlay"></div>
+            <h1>Style. Pamper. Glow.</h1>
+            <p>Book your favorite salon services with ease and convenience.</p>
+            <a href="userinfo.html" class="quote-cta">Book Now</a>
+        </section>
+
+        <section class="all-services-section">
+            <h2>Featured Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <img src="images/haircut.jpg" alt="Haircut Service">
+                    <h3>Haircut</h3>
+                    <p>Expert hair cutting and styling by professionals.</p>
+                </div>
+                <div class="service-card">
+                    <img src="images/facial.jpg" alt="Facial Service">
+                    <h3>Facial</h3>
+                    <p>Rejuvenate your skin with our premium facial treatments.</p>
+                </div>
+                <div class="service-card">
+                    <img src="images/manicure.jpg" alt="Manicure & Pedicure Service">
+                    <h3>Manicure & Pedicure</h3>
+                    <p>Pamper your hands and feet with our relaxing services.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script src="theme-switcher.js"></script>
+</body>
+</html>

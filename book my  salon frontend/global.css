@@ -1,0 +1,745 @@
+/* --- Global Styles --- */
+:root {
+    --primary-color: #f76b1c; /* A warm orange */
+    --primary-color-dark: #e05e16;
+    --accent-color: #4CAF50; /* Green for success/highlights */
+    --accent-dark: #388e3c;
+
+    /* Light Theme Color Variables */
+    --bg-light: #f4f7f6;
+    --text-primary-light: #333;
+    --text-secondary-light: #555;
+    --text-heading-light: #222; /* Added for headings */
+    --header-bg-light: #ffffff;
+    --footer-bg-light: #f1f1f1;
+    --border-color-light: #e0e0e0;
+    --card-bg-light: #ffffff;
+    --card-shadow-light: rgba(0, 0, 0, 0.1);
+    --input-bg-light: #ffffff; /* Added for input backgrounds */
+    --button-hover-bg-light: #f0f0f0; /* Added for general button hover */
+    
+    /* Status Message Colors (Light) */
+    --info-bg-light: #e0f7fa;
+    --info-border-light: #b2ebf2;
+    --info-text-light: #00838f;
+    --success-bg-light: #e8f5e9;
+    --success-border-light: #c8e6c9;
+    --success-text-light: #2e7d32;
+    --error-bg-light: #ffebee;
+    --error-border-light: #ef9a9a;
+    --error-text-light: #c62828;
+
+
+    /* Dark Theme Color Variables */
+    --bg-dark: #282c36;
+    --text-primary-dark: #f0f0f0;
+    --text-secondary-dark: #bbb;
+    --text-heading-dark: #f8f9fa; /* Added for headings */
+    --header-bg-dark: #20232a;
+    --footer-bg-dark: #20232a;
+    --border-color-dark: #444;
+    --card-bg-dark: #3a3f4b;
+    --card-shadow-dark: rgba(0, 0, 0, 0.3);
+    --input-bg-dark: #4a4f5b; /* Added for input backgrounds */
+    --button-hover-bg-dark: #4a4a4a; /* Added for general button hover */
+
+    /* Status Message Colors (Dark) */
+    --info-bg-dark: #264e52;
+    --info-border-dark: #4db6ac;
+    --info-text-dark: #80cbc4;
+    --success-bg-dark: #38643b;
+    --success-border-dark: #81c784;
+    --success-text-dark: #a5d6a7;
+    --error-bg-dark: #7f3232;
+    --error-border-dark: #ef5350;
+    --error-text-dark: #ef9a9a;
+
+    /* Common Variables (used by both themes) */
+    --button-text: #ffffff; /* White text for most buttons */
+    --shadow-small: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 8px rgba(0,0,0,0.1);
+    --shadow-hover: 0 6px 12px rgba(0,0,0,0.15);
+    --border-radius: 8px;
+    --padding-default: 1rem;
+}
+
+/* Theme Application */
+body[data-theme='light'] {
+    --bg-color: var(--bg-light);
+    --text-primary: var(--text-primary-light);
+    --text-secondary: var(--text-secondary-light);
+    --text-heading: var(--text-heading-light); /* Apply heading color */
+    --header-bg: var(--header-bg-light);
+    --footer-bg: var(--footer-bg-light);
+    --footer-text-color: var(--text-secondary-light);
+    --border-color: var(--border-color-light);
+    --card-bg: var(--card-bg-light);
+    --card-shadow: var(--card-shadow-light);
+    --logo-color: var(--primary-color);
+    --accent-primary: var(--primary-color);
+    --accent-dark-hover: var(--primary-color-dark); /* Renamed for clarity */
+    --input-bg: var(--input-bg-light); /* Apply input background */
+    --button-general-hover-bg: var(--button-hover-bg-light); /* Apply general button hover */
+
+    --info-bg: var(--info-bg-light);
+    --info-border: var(--info-border-light);
+    --info-text: var(--info-text-light);
+    --success-bg: var(--success-bg-light);
+    --success-border: var(--success-border-light);
+    --success-text: var(--success-text-light);
+    --error-bg: var(--error-bg-light);
+    --error-border: var(--error-border-light);
+    --error-text: var(--error-text-light);
+}
+
+body[data-theme='dark'] {
+    --bg-color: var(--bg-dark);
+    --text-primary: var(--text-primary-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --text-heading: var(--text-heading-dark); /* Apply heading color */
+    --header-bg: var(--header-bg-dark);
+    --footer-bg: var(--footer-bg-dark);
+    --footer-text-color: var(--text-secondary-dark);
+    --border-color: var(--border-color-dark);
+    --card-bg: var(--card-bg-dark);
+    --card-shadow: var(--card-shadow-dark);
+    --logo-color: var(--primary-color);
+    --accent-primary: var(--primary-color);
+    --accent-dark-hover: var(--primary-color-dark); /* Renamed for clarity */
+    --input-bg: var(--input-bg-dark); /* Apply input background */
+    --button-general-hover-bg: var(--button-hover-bg-dark); /* Apply general button hover */
+
+    --info-bg: var(--info-bg-dark);
+    --info-border: var(--info-border-dark);
+    --info-text: var(--info-text-dark);
+    --success-bg: var(--success-bg-dark);
+    --success-border: var(--success-border-dark);
+    --success-text: var(--success-text-dark);
+    --error-bg: var(--error-bg-dark);
+    --error-border: var(--error-border-dark);
+    --error-text: var(--error-text-dark);
+}
+
+/* Base Body Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Important for flexbox layout on body */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column; /* Default to column for pages without sidebar (like frontpage) */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+}
+
+/* Header Styles (for frontpage and general headers) */
+header {
+    background-color: var(--header-bg);
+    color: var(--text-primary);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between; /* Pushes logo left, controls right */
+    align-items: center;
+    box-shadow: var(--shadow-small);
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    z-index: 1000; /* Ensure header is on top */
+}
+
+header .logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color); /* Use primary color for logo */
+    text-decoration: none;
+    /* margin-right: auto; // Not needed with justify-content: space-between */
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Space between action groups (e.g., Partner btn & Auth btns) */
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Space between individual buttons like login, signup */
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 0.5rem; /* Space between login/signup */
+}
+
+/* General Button Styles */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.2rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent; /* Default border */
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+.btn-partner {
+    background-color: var(--accent-color);
+    color: var(--button-text);
+}
+.btn-partner:hover {
+    background-color: var(--accent-dark);
+}
+
+.btn-login {
+    background-color: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color); /* Add border for login */
+}
+.btn-login:hover {
+    background-color: var(--primary-color);
+    color: var(--button-text);
+}
+
+.btn-signup {
+    background-color: var(--primary-color);
+    color: var(--button-text);
+}
+.btn-signup:hover {
+    background-color: var(--primary-color-dark);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem; /* Larger icon */
+    cursor: pointer;
+    margin-left: 1rem; /* Space from other buttons */
+    color: var(--text-primary); /* Default icon color */
+    transition: color 0.3s ease;
+    line-height: 1; /* Helps vertical alignment */
+    display: flex; /* Helps center icon if it's an emoji/text */
+    align-items: center;
+    justify-content: center;
+}
+.theme-toggle:hover {
+    color: var(--primary-color);
+}
+
+/* Main Content Wrapper (for pages like frontpage) */
+main {
+    flex-grow: 1; /* Allows main content to push footer down */
+}
+
+/* Footer Styles */
+footer {
+    background-color: var(--footer-bg);
+    color: var(--footer-text-color);
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto; /* Push footer to the bottom */
+}
+
+
+/* --- Dashboard/Sidebar Layout (global.css) --- */
+/* (ఇది డాష్‌బోర్డ్ పేజీల కోసం) */
+
+/* Wrapper for sidebar and main content */
+.dashboard-wrapper {
+    display: flex;
+    width: 100%;
+    position: relative;
+    min-height: 100vh; /* Ensure wrapper takes full height */
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 240px; /* Default width */
+    min-width: 240px; /* Prevent shrinking below this */
+    background-color: var(--card-bg); /* Use card background for sidebar */
+    color: var(--text-primary);
+    box-shadow: var(--card-shadow); /* Use existing card shadow */
+    transition: all 0.3s ease;
+    position: fixed; /* Fixed sidebar */
+    height: 100%;
+    overflow-y: auto; /* Scrollable if content is long */
+    left: 0;
+    top: 0;
+    z-index: 1050; /* Above main content */
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.collapsed {
+    width: 60px; /* Collapsed width */
+    min-width: 60px;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--header-bg); /* Use header bg for sidebar header */
+}
+
+.sidebar-header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--logo-color);
+    white-space: nowrap; /* Keep logo on one line */
+    opacity: 1; /* Always visible */
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-header .logo {
+    opacity: 0; /* Hide logo when collapsed */
+    width: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.sidebar .toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+}
+.sidebar .toggle-btn:hover {
+    color: var(--primary-color);
+}
+.sidebar.collapsed .toggle-btn {
+    margin-left: auto; /* Push toggle to right when logo is hidden */
+}
+
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1; /* Allows list to take remaining space */
+}
+
+.sidebar li {
+    margin: 0;
+    position: relative;
+}
+
+.sidebar li a {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.sidebar li a i { /* Icon styling */
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    width: 20px; /* Fixed width for icons to align text */
+    text-align: center;
+}
+
+.sidebar.collapsed li a span {
+    display: none; /* Hide text when sidebar is collapsed */
+}
+
+.sidebar.collapsed li a i {
+    margin-right: 0; /* No margin when only icon is visible */
+    width: auto; /* Auto width for icons */
+}
+
+.sidebar li.active a,
+.sidebar li a:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar li.active a i,
+.sidebar li a:hover i {
+    color: white; /* Ensure icon color also changes on hover/active */
+}
+
+
+/* Main Content Area (for dashboard) */
+.main-content-area {
+    flex-grow: 1; /* Take all remaining space */
+    margin-left: 240px; /* Default: space for expanded sidebar */
+    transition: margin-left 0.3s ease;
+    display: flex; /* For header, main, footer layout */
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Adjust main content area when sidebar is collapsed */
+.sidebar.collapsed + .main-content-area {
+    margin-left: 60px; /* Space for collapsed sidebar */
+}
+
+/* Dashboard Header (for the main content area) */
+.dashboard-header {
+    display: flex;
+    justify-content: flex-end; /* Push theme toggle to right */
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--header-bg);
+    box-shadow: var(--shadow-small);
+    z-index: 100; /* Below sidebar */
+    /* position: sticky; top: 0; */
+}
+
+.dashboard-header .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Footer in main content area */
+.main-content-area footer {
+    margin-top: auto; /* Pushes footer to the bottom */
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    /* Header adjustments for frontpage */
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+    header .logo {
+        margin-right: 0; /* Reset margin */
+        margin-bottom: 1rem; /* Space below logo */
+    }
+    .header-controls {
+        width: 100%;
+        justify-content: space-between;
+        flex-direction: column; /* Stack actions vertically */
+        align-items: flex-start;
+        gap: 0.5rem; /* Reduced gap */
+    }
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+    .auth-buttons .btn, .btn-partner {
+        width: 100%;
+        text-align: center;
+    }
+    .theme-toggle {
+        margin-left: 0; /* Reset margin */
+        margin-top: 0.5rem; /* Space from other buttons */
+        width: 100%;
+        text-align: right; /* Keep toggle icon to the right */
+        justify-content: flex-end;
+    }
+
+    /* Dashboard specific responsive */
+    .dashboard-wrapper {
+        flex-direction: column; /* Stack sidebar and main content */
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -240px; /* Hide sidebar off-screen */
+        width: 240px;
+        z-index: 1100; /* Higher z-index for mobile overlay */
+        top: 0;
+        height: 100%;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    
+    .sidebar.collapsed { /* On mobile, "collapsed" means hidden */
+        left: -240px;
+    }
+
+    .sidebar.active { /* Show sidebar when active on mobile */
+        left: 0;
+    }
+
+    .sidebar-header .logo {
+        opacity: 1; /* Always show logo on mobile */
+        width: auto;
+    }
+    .sidebar-header .toggle-btn {
+        margin-left: 0; /* Reset margin */
+    }
+
+    .sidebar li a span {
+        display: inline; /* Always show text on mobile */
+    }
+
+    .main-content-area {
+        margin-left: 0; /* Main content takes full width */
+        width: 100%;
+    }
+    
+    .sidebar.collapsed + .main-content-area {
+        margin-left: 0; /* Also no margin when "collapsed" on mobile */
+    }
+
+    /* Overlay for mobile when sidebar is active */
+    body.sidebar-active::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000; /* Below sidebar, above main content */
+        cursor: pointer;
+    }
+
+    .dashboard-header {
+        justify-content: flex-end; /* Keep theme toggle to right */
+        padding: 1rem;
+    }
+    /* If you want a logo in dashboard header on mobile */
+    .dashboard-header .header-left {
+        /* display: flex; align-items: center; */
+    }
+    .dashboard-header .logo {
+        /* font-size: 1.5rem; font-weight: bold; color: var(--logo-color); */
+    }
+    
+}
+
+/* Generic icon styles (replace with actual font icons or SVGs) */
+.icon-home::before { content: '🏠'; }
+.icon-barber::before { content: '💈'; }
+.icon-calendar::before { content: '📅'; }
+.icon-user::before { content: '👤'; }
+.icon-register::before { content: '✍️'; }
+.icon-logout::before { content: '🚪'; }
+
+/* -------------------------------------------------------------------------------------------------- */
+/* --- NEW/MODIFIED STYLES FOR SALON LIST PAGE (ONLY THESE SECTIONS ARE CHANGED/ADDED) --- */
+/* -------------------------------------------------------------------------------------------------- */
+
+/* Main Content Area specific for pages with dynamic content like salons list */
+.main-content-area {
+    padding: 20px; /* Adjust padding as needed for inner content */
+    /* margin-left is already handled above for sidebar */
+}
+
+/* Container for Filters & Salon List */
+.container {
+    max-width: 1200px; /* Limit width for better readability */
+    margin: 0 auto; /* Center the container */
+    padding: 0; /* Reset padding as main-content-area handles it */
+}
+
+/* Filters and Sort Section */
+.filters-sort-section {
+    display: flex; /* Use flexbox for horizontal arrangement */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 10px; /* Space between elements */
+    margin-bottom: 25px;
+    background-color: var(--card-bg); /* Use theme variable */
+    padding: 15px;
+    border-radius: var(--border-radius); /* Use existing border-radius variable */
+    box-shadow: var(--shadow-small); /* Use existing shadow variable */
+    align-items: center; /* Vertically align items */
+}
+
+.filters-sort-section input[type="text"],
+.filters-sort-section select {
+    padding: 10px 15px;
+    border: 1px solid var(--border-color); /* Use theme variable */
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--input-bg); /* Use theme variable */
+    color: var(--text-primary); /* Use theme variable */
+    flex: 1 1 200px; /* Allow items to grow/shrink, with a base width */
+    min-width: 150px; /* Ensure a minimum width */
+}
+
+.filters-sort-section button {
+    padding: 10px 20px;
+    background-color: var(--primary-color); /* Use theme variable */
+    color: var(--button-text); /* Use common button text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.filters-sort-section button:hover {
+    background-color: var(--primary-color-dark); /* Use existing primary-color-dark for hover */
+}
+
+/* Location Status Message */
+.location-status-message {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius); /* Use existing border-radius */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: var(--text-primary); /* Default text color */
+}
+
+.location-status-message .icon {
+    font-size: 1.2em;
+}
+
+.location-status-message.info {
+    background-color: var(--info-bg);
+    border: 1px solid var(--info-border);
+    color: var(--info-text);
+}
+
+.location-status-message.success {
+    background-color: var(--success-bg);
+    border: 1px solid var(--success-border);
+    color: var(--success-text);
+}
+
+.location-status-message.error {
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+}
+
+
+/* Salon Grid Layout (THE MAIN CHANGE FOR ORDERING) */
+.salon-grid {
+    display: grid; /* This is key for grid layout */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive columns */
+    gap: 25px; /* Space between salon cards */
+    padding: 20px 0;
+}
+
+/* Individual Salon Card Styling */
+.salon-card {
+    background-color: var(--card-bg); /* Use theme variable */
+    border-radius: var(--border-radius); /* Use existing border-radius */
+    box-shadow: var(--shadow-medium); /* Use existing shadow variable */
+    overflow: hidden; /* Ensures image corners are rounded */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex; /* Flex container for content inside card */
+    flex-direction: column; /* Stack image and text vertically */
+    height: 100%; /* Ensures all cards in a row have same height */
+}
+
+.salon-card:hover {
+    transform: translateY(-5px); /* Subtle lift effect on hover */
+    box-shadow: var(--shadow-hover); /* Use existing hover shadow */
+}
+
+.salon-card img {
+    width: 100%;
+    height: 180px; /* Fixed height for consistent image size */
+    object-fit: cover; /* Ensures images cover the area without distortion */
+    border-bottom: 1px solid var(--border-color);
+}
+
+.salon-card h3 {
+    margin-top: 15px;
+    margin-bottom: 8px;
+    color: var(--text-heading); /* Use the new heading text variable */
+    font-size: 1.3em;
+    padding: 0 1rem; /* Add padding to match the content div */
+}
+
+.salon-card p {
+    margin-bottom: 5px;
+    color: var(--text-primary); /* Use theme variable */
+    font-size: 0.95em;
+    line-height: 1.4;
+    padding: 0 1rem; /* Add padding to match the content div */
+}
+/* Ensure the padding for text within the card is handled, as the existing HTML had a div around it. */
+.salon-card > div { /* Target the div directly inside salon-card */
+    padding: 0 1rem 1rem;
+    flex-grow: 1; /* Allow content to push button down */
+    display: flex;
+    flex-direction: column;
+}
+.salon-card > div > p { /* Remove specific p padding if parent div already has it */
+    padding: 0;
+}
+
+.salon-card .view-details-btn {
+    display: block; /* Make button take full width */
+    width: calc(100% - 2rem); /* Account for padding */
+    padding: 10px 15px;
+    margin: auto 1rem 1rem 1rem; /* Push button to bottom with auto top margin, 1rem side/bottom */
+    background-color: var(--accent-color); /* Use existing accent color */
+    color: var(--button-text); /* Use common button text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.salon-card .view-details-btn:hover {
+    background-color: var(--accent-dark); /* Use existing accent-dark for hover */
+}
+
+/* Adjustments for the header's toggle button (if not already handled) */
+header .toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary); /* Use text-primary for header toggle */
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0 10px;
+    position: absolute; /* Position relative to header */
+    left: 10px;
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect centering */
+    z-index: 1002; /* Ensure it's above other header elements if needed */
+}
+
+/* Ensure the theme toggle in the header on salons.html uses the right variable for color */
+#themeToggleContainer #themeToggle { /* More specific selector */
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--text-primary); /* Use text-primary for its icon */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#themeToggleContainer #themeToggle:hover {
+    background-color: var(--button-general-hover-bg); /* Use general button hover for subtle effect */
+}
+
+
+/* -------------------------------------------------------------------------------------------------- */
+/* --- END OF NEW/MODIFIED STYLES --- */
+/* -------------------------------------------------------------------------------------------------- */

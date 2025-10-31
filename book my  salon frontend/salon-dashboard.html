@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salon Dashboard | Book My Salon</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        /* Note: Basic body/header/footer/sidebar styles are handled by global.css */
+        
+        main {
+            margin-left: 240px; 
+            transition: margin-left 0.3s ease;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .dashboard-content {
+            padding: 1rem 2rem;
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        .welcome-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        .welcome-section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-primary); 
+        }
+        .welcome-section p {
+            color: var(--text-secondary);
+        }
+
+        /* Summary Cards */
+        .salon-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .salon-stat-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px var(--card-shadow);
+            border-left: 5px solid var(--accent-primary);
+            text-align: left;
+        }
+        .salon-stat-card h3 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .salon-stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        /* Appointments Feed */
+        .appointments-feed {
+            margin-top: 2rem;
+        }
+        .appointments-feed h3 {
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+        .appointment-item {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .appointment-item span {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <header>
+        <button class="toggle-btn" id="toggleBtn">&#9776;</button>
+        <a href="frontpage.html" class="logo">Book My Salon</a>
+        <div id="themeToggleContainer">
+             <button id="themeToggle" class="toggle-btn" style="position: static; margin-left: 20px;">🌙</button>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+        <ul>
+            <li data-page="salon-dashboard.html" class="active"><a href="salon-dashboard.html"><i>💼</i><span>Salon Dashboard</span></a></li>
+            <li data-page="salon-appointments.html"><a href="salon-appointments.html"><i>📅</i><span>Manage Bookings</span></a></li>
+            <li data-page="salon-services.html"><a href="salon-services.html"><i>✂️</i><span>Edit Services</span></a></li>
+            <li data-page="salon-reports.html"><a href="salon-reports.html"><i>📊</i><span>Reports</span></a></li>
+            <li data-action="logout"><a href="#"><i>🚪</i><span>Log Out</span></a></li>
+        </ul>
+    </aside>
+
+    <main>
+        <div class="dashboard-content">
+             <section class="welcome-section">
+                <h2 id="salonGreeting">Welcome, Salon Partner!</h2>
+                <p>Manage your appointments, earnings, and profile details.</p>
+            </section>
+        </div>
+
+        <section class="salon-stats-grid">
+            <div class="salon-stat-card">
+                <h3>New Bookings Today</h3>
+                <div class="value" id="newBookings">Loading...</div>
+            </div>
+            <div class="salon-stat-card">
+                <h3>Total Earnings (MoM)</h3>
+                <div class="value" id="totalEarnings">Loading...</div>
+            </div>
+            <div class="salon-stat-card">
+                <h3>Pending Requests</h3>
+                <div class="value" id="pendingRequests">Loading...</div> 
+            </div>
+        </section>
+
+        <section class="appointments-feed">
+            <h3>Recent Activity</h3>
+            <div id="recentAppointments">
+                <p style="color: var(--text-secondary);">No recent activity to display.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const SALON_API_BASE_URL = 'http://localhost:3000'; 
+
+        // --- AUTH CHECK: CRITICAL LOGIC (Specific to Salon Token) ---
+        function checkSalonAuthentication() {
+            const salonToken = localStorage.getItem('salonAuthToken');
+            const salonId = localStorage.getItem('salonId');
+            
+            if (!salonToken || !salonId) {
+                // If not authenticated, redirect to the frontpage
+                window.location.href = 'frontpage.html'; 
+                return false;
+            }
+            return salonId;
+        }
+        
+        // --- DATA FETCHING (Adjusted to match backend response) ---
+        async function fetchSalonStats(salonId) {
+            const salonToken = localStorage.getItem('salonAuthToken');
+            
+            try {
+                const response = await fetch(`${SALON_API_BASE_URL}/api/salon/dashboard/${salonId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${salonToken}`
+                    }
+                });
+                
+                const result = await response.json(); // Use 'result' to avoid confusion with internal 'data'
+
+                if (response.ok && result.success) {
+                    const salonData = result.salon;
+                    const dashboardStats = result.dashboardData; // <-- Dashboard data comes under this key
+
+                    // Update UI elements in salon-dashboard.html
+                    document.getElementById('salonGreeting').textContent = `Welcome, ${salonData.name || 'Salon Partner'}!`;
+                    document.getElementById('newBookings').textContent = dashboardStats.totalAppointmentsToday || 0;
+                    document.getElementById('totalEarnings').textContent = `₹${dashboardStats.revenueThisMonth ? dashboardStats.revenueThisMonth.toLocaleString() : '0.00'}`;
+                    document.getElementById('pendingRequests').textContent = dashboardStats.pendingRequests || 0; // Added for new stat card
+                    
+                    // Render Recent Appointments (Placeholder logic, as backend currently returns static data)
+                    const feed = document.getElementById('recentAppointments');
+                    feed.innerHTML = ''; // Clear existing content
+
+                    if (dashboardStats.recentAppointments && dashboardStats.recentAppointments.length > 0) {
+                        dashboardStats.recentAppointments.slice(0, 3).forEach(app => {
+                            const item = document.createElement('div');
+                            item.classList.add('appointment-item');
+                            // Example data structure; adjust based on actual backend 'recentAppointments' if you add it
+                            item.innerHTML = `<span>Client: ${app.clientName || 'N/A'}</span><span style="font-weight: 600;">Service: ${app.serviceName || 'N/A'}</span><span style="color: ${app.status === 'Confirmed' ? '#4CAF50' : '#FFC107'};">Status: ${app.status || 'N/A'}</span>`;
+                            feed.appendChild(item);
+                        });
+                    } else {
+                        feed.innerHTML = '<p style="color: var(--text-secondary);">No recent activity to display.</p>';
+                    }
+
+                } else {
+                    console.error("Failed to load dashboard data:", result.message || "Unknown error");
+                    alert("Failed to load dashboard data: " + (result.message || "Please try again."));
+                    // Redirect to login or frontpage if token is invalid or unauthorized
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('salonAuthToken');
+                        localStorage.removeItem('salonId');
+                        localStorage.removeItem('salonName');
+                        window.location.href = 'frontpage.html';
+                    }
+                }
+            } catch (error) {
+                console.error("Network error during dashboard fetch:", error);
+                alert("Network error. Could not connect to the salon API. Check if the server is running.");
+            }
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentSalonId = checkSalonAuthentication(); // This will redirect if not authenticated
+
+            if (currentSalonId) {
+                // Fetch Data only if authenticated
+                fetchSalonStats(currentSalonId);
+            }
+            
+            // --- Theme/Sidebar/Logout Logic ---
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            themeToggle.addEventListener('click', () => {
+                const newTheme = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+            
+            if (window.innerWidth > 768) {
+                if (localStorage.getItem('sidebarState') === 'collapsed') sidebar.classList.add('collapsed');
+            }
+            
+            toggleBtn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('active');
+                    document.body.classList.toggle('sidebar-active'); 
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+                }
+            });
+
+            // Logout Logic 
+            document.querySelectorAll('li[data-action="logout"] a').forEach(anchor => {
+                 anchor.addEventListener('click', (e) => {
+                    e.preventDefault(); 
+                    localStorage.removeItem('salonAuthToken'); 
+                    localStorage.removeItem('salonId'); // Added for consistency
+                    localStorage.removeItem('salonName');
+                    window.location.href = 'frontpage.html'; // Redirect to a public page
+                   });
+            });
+            
+            // Highlight active link
+            const currentPage = window.location.pathname.split('/').pop() || 'salon-dashboard.html'; // Default to dashboard
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                 li.classList.toggle('active', li.getAttribute('data-page') === currentPage);
+            });
+        });
+    </script>
+</body>
+</html>

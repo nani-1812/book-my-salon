@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salons - BookMySalon</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    </head>
+<body data-theme="light">
+
+    <div class="dashboard-wrapper">
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="frontpage.html" class="logo">Book My Salon</a>
+                <button class="toggle-btn" id="toggleBtn" title="Toggle Sidebar">☰</button>
+            </div>
+            <ul>
+                <li data-page="dashboard.html"><a href="dashboard.html"><i class="icon-home"></i><span>Dashboard</span></a></li>
+                <li data-page="salons.html" class="active"><a href="salons.html"><i class="icon-barber"></i><span>Salons</span></a></li>
+                <li data-page="appointments.html"><a href="appointments.html"><i class="icon-calendar"></i><span>My Appointments</span></a></li>
+                <li data-page="profile.html"><a href="profile.html"><i class="icon-user"></i><span>Profile</span></a></li>
+                <li data-page="salon-register.html"><a href="salon-register.html"><i class="icon-register"></i><span>Register Salon</span></a></li>
+                <li data-action="logout"><a href="#"><i class="icon-logout"></i><span>Logout</span></a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content-area">
+            <header class="dashboard-header">
+                <div class="header-left">
+                </div>
+                <div class="header-right">
+                    <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+                </div>
+            </header>
+
+            <main>
+                <div class="container">
+                    <div class="filters-sort-section">
+                        <input type="text" id="salonSearch" placeholder="Search by name or service...">
+                        <select id="serviceFilter">
+                            <option value="">All Services</option>
+                            <option value="Haircut">Haircut</option>
+                            <option value="Facial">Facial</option>
+                            <option value="Shave">Shave</option>
+                            <option value="Hair Color">Hair Color</option>
+                            <option value="Manicure">Manicure</option>
+                            <option value="Pedicure">Pedicure</option>
+                            <option value="Spa">Spa</option>
+                            <option value="Bridal Makeup">Bridal Makeup</option>
+                            <option value="Waxing">Waxing</option>
+                        </select>
+                        <select id="sortBy">
+                            <option value="rating">Sort by Rating</option>
+                            <option value="distance">Sort by Distance</option>
+                        </select>
+                        <button id="applyFilters">Apply Filters</button>
+                    </div>
+
+                    <div id="locationStatus" class="location-status-message info">
+                        <span class="icon">🕒</span> <span class="message">Attempting to get your location...</span>
+                    </div>
+
+                    <div id="salonList" class="salon-grid">
+                        </div>
+                </div>
+            </main>
+
+            <footer>
+                <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+            </footer>
+        </div> </div> <script src="theme-switcher.js"></script>
+    <script>
+        // --- CONFIGURATION ---
+        const API_BASE_URL = 'http://localhost:3000'; // Base URL for backend API calls
+        // Mock coordinates for Raipur and Naya Raipur (used if geolocation fails or is disabled)
+        const MOCK_RAIPUR_LAT = 21.2514; // Raipur Latitude
+        const MOCK_RAIPUR_LON = 81.6296; // Raipur Longitude
+        const MOCK_NAYA_RAIPUR_LAT = 21.1396; // Naya Raipur Latitude
+        const MOCK_NAYA_RAIPUR_LON = 81.7640; // Naya Raipur Longitude
+
+        // --- GLOBAL VARIABLES ---
+        let userLatitude = MOCK_RAIPUR_LAT;  // Variable to store user's current latitude, defaults to mock
+        let userLongitude = MOCK_RAIPUR_LON; // Variable to store user's current longitude, defaults to mock
+
+        // --- UI ELEMENT REFERENCES ---
+        // Get references to DOM elements needed for interactivity
+        const salonSearchInput = document.getElementById('salonSearch');
+        const serviceFilterSelect = document.getElementById('serviceFilter');
+        const sortBySelect = document.getElementById('sortBy');
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        const salonListDiv = document.getElementById('salonList');
+        const locationStatusDiv = document.getElementById('locationStatus');
+        const logoutLink = document.querySelector('li[data-action="logout"] a'); // Reference to the logout link in sidebar
+        const sidebar = document.getElementById('sidebar'); // Reference to the sidebar element
+        const toggleBtn = document.getElementById('toggleBtn'); // Reference to the sidebar toggle button
+        const themeToggleBtn = document.getElementById('themeToggle'); // Reference to the theme toggle button in the header
+
+        // --- DEMO DATA ---
+        // Array of hardcoded demo salon objects for display purposes (especially if API fails)
+        const demoSalons = [
+            // ... (demo salon objects remain unchanged) ...
+             {
+                id: 'demo1',
+                name: 'Option The Salon',
+                address: 'Plot 2, VIP Road, Raipur',
+                rating: 4.5,
+                reviews: 120,
+                services: [
+                    { name: 'Haircut', price: 250 },
+                    { name: 'Shave', price: 150 },
+                    { name: 'Facial', price: 800 }
+                ],
+                imageUrl: 'images/theoptionsalon.jpg', // మీ ఫైల్ పేరు
+                location: { coordinates: [81.6296, 21.2514] } // Raipur
+            },
+            {
+                id: 'demo2',
+                name: 'Hair Fashion Family Salon & Spa',
+                address: 'Civil Lines, G.E. Road, Raipur',
+                rating: 4.2,
+                reviews: 95,
+                services: [
+                    { name: 'Hair Color', price: 1500 },
+                    { name: 'Keratin', price: 3000 },
+                    { name: 'Spa', price: 1000 }
+                ],
+                imageUrl: 'images/hairfashion.jpg', // మీ ఫైల్ పేరు
+                location: { coordinates: [81.6343, 21.2440] } // Raipur
+            },
+            {
+                id: 'demo3',
+                name: 'Lovely\'s Beauty Salon',
+                address: 'Sadar Bazar Road, Near Magneto The Mall, Raipur',
+                rating: 4.8,
+                reviews: 210,
+                services: [
+                    { name: 'Manicure', price: 700 },
+                    { name: 'Pedicure', price: 800 },
+                    { name: 'Haircut', price: 500 }
+                ],
+                imageUrl: 'images/lovelybeautysalon.jpg', // మీ ఫైల్ పేరు
+                imageUrls: ['images/lovelysalon.jpg'], // అదనపు చిత్రం
+                location: { coordinates: [81.6780, 21.2215] } // Raipur
+            },
+            {
+                id: 'demo4',
+                name: 'Elegant Lady Salon',
+                address: 'Telibandha Chowk, Raipur',
+                rating: 4.0,
+                reviews: 75,
+                services: [
+                    { name: 'Facial', price: 1200 },
+                    { name: 'Waxing', price: 600 },
+                    { name: 'Hair Spa', price: 1100 }
+                ],
+                imageUrl: 'images/elegantladysalon.jpg', // మీ ఫైల్ పేరు
+                location: { coordinates: [81.6250, 21.2380] } // Raipur
+            },
+            {
+                id: 'demo5',
+                name: 'Style & Pamper Studio',
+                address: 'City Centre Mall, G.E. Road, Raipur',
+                rating: 4.3,
+                reviews: 150,
+                services: [
+                    { name: 'Hair Rebonding', price: 6000 },
+                    { name: 'Body Polishing', price: 2500 },
+                    { name: 'Haircut', price: 400 }
+                ],
+                imageUrl: 'images/style&pampersstudio.jpg', // మీ ఫైల్ పేరు
+                imageUrls: ['images/style-pamper-glow.jpg'], // అదనపు చిత్రం
+                location: { coordinates: [81.6570, 21.2400] } // Raipur
+            },
+            {
+                id: 'demo6',
+                name: 'Urban Edge Salon',
+                address: 'Sector 27, Central Avenue, Naya Raipur',
+                rating: 4.7,
+                reviews: 80,
+                services: [
+                    { name: 'Haircut', price: 300 },
+                    { name: 'Beard Trim', price: 200 },
+                    { name: 'Head Massage', price: 400 }
+                ],
+                imageUrl: 'images/urbanedgesalon.jpg', // మీ ఫైల్ పేరు
+                location: { coordinates: [MOCK_NAYA_RAIPUR_LON, MOCK_NAYA_RAIPUR_LAT] } // Naya Raipur
+            },
+            // కొత్తగా జోడించిన సెలూన్‌లు (మీరు అందించిన పేర్లు లేని చిత్రాలతో కలిపి)
+            {
+                id: 'demo7',
+                name: 'The Gentleman\'s Cut', // పాత పేరు
+                address: 'Near Capitol Complex, Naya Raipur',
+                rating: 4.1,
+                reviews: 60,
+                services: [
+                    { name: 'Haircut', price: 280 },
+                    { name: 'Facial', price: 900 },
+                    { name: 'Manicure', price: 650 }
+                ],
+                imageUrl: 'images/haircut.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [MOCK_NAYA_RAIPUR_LON + 0.01, MOCK_NAYA_RAIPUR_LAT + 0.01] } // Naya Raipur slightly offset
+            },
+            {
+                id: 'demo8',
+                name: 'Glamour Gals Salon (Raipur)', // పాత పేరు
+                address: 'Shyam Nagar, Ring Road No. 1, Raipur',
+                rating: 3.9,
+                reviews: 50,
+                services: [
+                    { name: 'Party Makeup', price: 2000 },
+                    { name: 'Hair Styling', price: 700 },
+                    { name: 'Pedicure', price: 750 }
+                ],
+                imageUrl: 'images/hairstyle.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [81.6000, 21.2600] } // Raipur
+            },
+            {
+                id: 'demo9',
+                name: 'Sparkle & Shine Beauty', // కొత్త సెలూన్
+                address: 'Telibandha Main Road, Raipur',
+                rating: 4.6,
+                reviews: 110,
+                services: [
+                    { name: 'Manicure', price: 350 },
+                    { name: 'Pedicure', price: 600 },
+                    { name: 'Nail Art', price: 250 }
+                ],
+                imageUrl: 'images/manicure.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [81.6500, 21.2300] } // Raipur
+            },
+            {
+                id: 'demo10',
+                name: 'Radiant Glow Studio', // కొత్త సెలూన్
+                address: 'Block B, Sector 29, Naya Raipur',
+                rating: 4.4,
+                reviews: 70,
+                services: [
+                    { name: 'Facial', price: 800 },
+                    { name: 'Body Massage', price: 1500 },
+                    { name: 'Skin Care', price: 1000 }
+                ],
+                imageUrl: 'images/facial.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [MOCK_NAYA_RAIPUR_LON - 0.01, MOCK_NAYA_RAIPUR_LAT - 0.01] } // Naya Raipur slightly offset
+            },
+            {
+                id: 'demo11',
+                name: 'Luxury Spa & Salon', // కొత్త సెలూన్
+                address: 'VIP Road, Shankar Nagar, Raipur',
+                rating: 4.9,
+                reviews: 200,
+                services: [
+                    { name: 'Full Body Spa', price: 3000 },
+                    { name: 'Deep Tissue Massage', price: 2500 },
+                    { name: 'Hair Color', price: 2000 }
+                ],
+                imageUrl: 'images/salonpic2.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [81.6150, 21.2350] } // Raipur
+            },
+            {
+                id: 'demo12',
+                name: 'The Perfect Cut', // కొత్త సెలూన్
+                address: 'Near Data Centre, Sector 19, Naya Raipur',
+                rating: 4.0,
+                reviews: 55,
+                services: [
+                    { name: 'Haircut', price: 220 },
+                    { name: 'Shave', price: 120 },
+                    { name: 'Beard Styling', price: 150 }
+                ],
+                imageUrl: 'images/salonpic3.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [MOCK_NAYA_RAIPUR_LON + 0.02, MOCK_NAYA_RAIPUR_LAT - 0.02] } // Naya Raipur
+            },
+            {
+                id: 'demo13',
+                name: 'Divine Beauty Parlour', // కొత్త సెలూన్
+                address: 'MG Road, Jaistambh Chowk, Raipur',
+                rating: 4.7,
+                reviews: 180,
+                services: [
+                    { name: 'Bridal Makeup', price: 10000 },
+                    { name: 'Party Makeup', price: 2500 },
+                    { name: 'Hair Spa', price: 1200 }
+                ],
+                imageUrl: 'images/salonpic6.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [81.6300, 21.2280] } // Raipur
+            },
+            {
+                id: 'demo14',
+                name: 'Royal Gents Grooming', // కొత్త సెలూన్
+                address: 'Old Dhamtari Road, Near Balaji Temple, Raipur',
+                rating: 3.8,
+                reviews: 40,
+                services: [
+                    { name: 'Haircut', price: 200 },
+                    { name: 'Shave', price: 100 },
+                    { name: 'Clean Up', price: 400 }
+                ],
+                imageUrl: 'images/salonpic7.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [81.6600, 21.2100] } // Raipur
+            },
+            {
+                id: 'demo15',
+                name: 'Trendy Locks Salon', // కొత్త సెలూన్
+                address: 'Near AIIMS, Naya Raipur',
+                rating: 4.2,
+                reviews: 65,
+                services: [
+                    { name: 'Haircut', price: 280 },
+                    { name: 'Hair Spa', price: 900 },
+                    { name: 'Facial', price: 1200 }
+                ],
+                imageUrl: 'images/salonpic8.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [MOCK_NAYA_RAIPUR_LON - 0.02, MOCK_NAYA_RAIPUR_LAT + 0.02] } // Naya Raipur
+            },
+            {
+                id: 'demo16',
+                name: 'Chic Hair & Beauty', // కొత్త సెలూన్
+                address: 'Fafadih, Raipur',
+                rating: 4.5,
+                reviews: 90,
+                services: [
+                    { name: 'Hair Color', price: 1800 },
+                    { name: 'Highlights', price: 2500 },
+                    { name: 'Blow Dry', price: 400 }
+                ],
+                imageUrl: 'images/salonpic9.jpg', // మీరు అందించిన చిత్రం
+                location: { coordinates: [81.6400, 21.2450] } // Raipur
+            }
+        ];
+
+
+        // --- 2. UI RENDERING FUNCTIONS ---
+        // Function to update the location status message bar
+        function updateLocationStatus(type, icon, message) {
+            if (!locationStatusDiv) {
+                console.error("locationStatusDiv element not found in the DOM.");
+                return;
+            }
+            const iconSpan = locationStatusDiv.querySelector('.icon');
+            const messageSpan = locationStatusDiv.querySelector('.message');
+
+            if (iconSpan) iconSpan.textContent = icon;
+            if (messageSpan) messageSpan.textContent = message;
+
+            // Reset class and apply the new type (info, success, error) for styling
+            locationStatusDiv.className = 'location-status-message';
+            locationStatusDiv.classList.add(type);
+        }
+
+        // Function to render the list of salon cards in the salonListDiv
+        function renderSalonCards(salonsToRender) {
+            salonListDiv.innerHTML = ''; // Clear previous salon list
+
+            // Display a message if no salons match the criteria
+            if (!salonsToRender || salonsToRender.length === 0) {
+                salonListDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No salons found matching your criteria. Try adjusting filters.</p>';
+                return;
+            }
+
+            // Iterate through each salon and create its HTML card
+            salonsToRender.forEach((salon) => {
+                const card = document.createElement('div');
+                card.classList.add('salon-card'); // Apply styling from CSS
+
+                // Ensure address includes "Raipur" if not already present
+                const displayAddress = salon.address.toLowerCase().includes('raipur') ? salon.address : `${salon.address}, Raipur`;
+
+                // Generate a preview of services (first 3)
+                let servicesHtml = 'N/A';
+                if (Array.isArray(salon.services) && salon.services.length > 0) {
+                    servicesHtml = salon.services.slice(0, 3).map(svc => svc.name || svc.serviceName).join(', ');
+                    if(salon.services.length > 3) servicesHtml += ', ...';
+                }
+
+                // Calculate distance if salon location and user location are available
+                let distance = 'N/A';
+                if (salon.location && salon.location.coordinates && userLatitude && userLongitude) {
+                    const salonLon = salon.location.coordinates[0];
+                    const salonLat = salon.location.coordinates[1];
+                    distance = calculateDistance(userLatitude, userLongitude, salonLat, salonLon).toFixed(1);
+                }
+                const distanceHtml = (distance !== 'N/A') ? `<p>Distance: ${distance} km</p>` : '';
+
+                // Set the inner HTML of the card
+                card.innerHTML = `
+                    <img src="${salon.imageUrl || 'https://via.placeholder.com/280x180?text=Salon+Image'}" alt="${salon.name}"/>
+                    <div>
+                        <h3>${salon.name}</h3>
+                        <p>⭐ ${salon.rating || 'N/A'} (${salon.reviews || 0} reviews)</p>
+                        <p>📍 ${displayAddress}</p>
+                        <p style="font-style: italic; color: var(--text-primary);">Styles: ${servicesHtml}</p>
+                        ${distanceHtml}
+                        <button class="view-details-btn" data-id="${salon.id}">View Details</button>
+                    </div>
+                `;
+
+                // Add event listener to the "View Details" button
+                card.querySelector('.view-details-btn').addEventListener('click', () => {
+                    // Store demo salon data in localStorage if it's a demo salon
+                    if (String(salon.id).startsWith('demo')) {
+                        localStorage.setItem('selectedDemoSalon', JSON.stringify(salon));
+                    } else {
+                        localStorage.removeItem('selectedDemoSalon'); // Remove if it's not a demo salon
+                    }
+                    // Navigate to the salon details page with the salon ID
+                    window.location.href = `salon-details.html?id=${salon.id}`;
+                });
+                salonListDiv.appendChild(card); // Add the created card to the list container
+            });
+        }
+
+        // Function to calculate distance between two lat/lon points (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth radius in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in kilometers
+        }
+
+        // --- 3. DATA FETCHING LOGIC ---
+        // Function to fetch salons from the backend API based on filters and location
+        async function fetchSalons(lat, lon, searchTerm, serviceFilter, sortBy) {
+            salonListDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Searching for salons...</p>'; // Show loading message
+
+            try {
+                // Construct the API URL with query parameters
+                let url = new URL(`${API_BASE_URL}/api/salons`);
+                const params = {};
+                if (lat !== null) params.lat = lat;
+                if (lon !== null) params.lon = lon;
+                if (searchTerm) params.search = searchTerm;
+                if (serviceFilter) params.service = serviceFilter;
+                if (sortBy) params.sort = sortBy;
+                url.search = new URLSearchParams(params).toString();
+
+                // Make the API request
+                const response = await fetch(url);
+                const apiSalons = await response.json(); // Parse JSON response
+
+                // Process the response
+                if (response.ok) {
+                    // Format demo salons to match potential API structure (e.g., ensure 'id' and 'name' properties)
+                    const formattedDemoSalons = demoSalons.map(s => {
+                        return {...s, id: s.id, name: s.name || s.salonName};
+                    });
+
+                    // Combine demo salons with salons fetched from the API
+                    let allSalons = [];
+                    if (Array.isArray(apiSalons)) { // If API returns a simple array
+                        allSalons = [...formattedDemoSalons, ...apiSalons];
+                    } else if (apiSalons && Array.isArray(apiSalons.salons)) { // If API returns { salons: [...] }
+                        allSalons = [...formattedDemoSalons, ...apiSalons.salons];
+                    } else { // Fallback to only demo salons if API response format is unexpected
+                        allSalons = [...formattedDemoSalons];
+                        console.warn("API response was not an array or expected format, showing demo salons only.");
+                    }
+
+                    // --- Client-side Filtering and Sorting (Applied to combined demo + API results) ---
+                    let filteredSalons = allSalons;
+                    // Filter by search term (name, address, service name)
+                    if (searchTerm) {
+                        const lowerSearchTerm = searchTerm.toLowerCase();
+                        filteredSalons = filteredSalons.filter(salon =>
+                            salon.name.toLowerCase().includes(lowerSearchTerm) ||
+                            salon.address.toLowerCase().includes(lowerSearchTerm) ||
+                            (Array.isArray(salon.services) && salon.services.some(svc =>
+                                (svc.name || svc.serviceName).toLowerCase().includes(lowerSearchTerm)
+                            ))
+                        );
+                    }
+                    // Filter by selected service
+                    if (serviceFilter) {
+                        const lowerServiceFilter = serviceFilter.toLowerCase();
+                        filteredSalons = filteredSalons.filter(salon =>
+                            Array.isArray(salon.services) && salon.services.some(svc =>
+                                (svc.name || svc.serviceName).toLowerCase().includes(lowerServiceFilter)
+                            )
+                        );
+                    }
+
+                    // Sort the filtered results
+                    if (sortBy === 'rating') {
+                        filteredSalons.sort((a, b) => (b.rating || 0) - (a.rating || 0)); // Sort descending by rating
+                    } else if (sortBy === 'distance' && userLatitude && userLongitude) {
+                        // Calculate distance for each salon before sorting
+                        filteredSalons.forEach(salon => {
+                            if (salon.location && salon.location.coordinates) {
+                                salon.distance = calculateDistance(userLatitude, userLongitude, salon.location.coordinates[1], salon.location.coordinates[0]);
+                            } else {
+                                salon.distance = Infinity; // Salons without location go last
+                            }
+                        });
+                        filteredSalons.sort((a, b) => a.distance - b.distance); // Sort ascending by distance
+                    }
+                    // --- End Client-side Filtering and Sorting ---
+
+                    renderSalonCards(filteredSalons); // Render the final list of salons
+
+                    // Update location status based on results
+                    if (apiSalons && apiSalons.message) { // If API returned a specific message
+                         updateLocationStatus('info', 'ℹ️', apiSalons.message);
+                    } else if (filteredSalons.length === 0 && (searchTerm || serviceFilter)) { // If filters applied but no results
+                        updateLocationStatus('info', 'ℹ️', 'No salons found matching your filters. Try widening your search.');
+                    } else if (filteredSalons.length > 0 && !searchTerm && !serviceFilter && Array.isArray(apiSalons) && apiSalons.length === 0) { // If only demo salons shown initially
+                        updateLocationStatus('success', '✅', `Showing ${demoSalons.length} demo salons near Raipur.`);
+                    }
+
+                } else { // If API response status was not OK (e.g., 4xx, 5xx)
+                    renderSalonCards(demoSalons); // Fallback to showing demo salons
+                    updateLocationStatus('error', '❌', `Error fetching salons from API: ${apiSalons.message || 'Check backend status.'}`);
+                }
+            } catch (error) { // Catch network errors (e.g., backend server down)
+                console.error("Fetch Salons Error:", error);
+                updateLocationStatus('error', '❌', `Network Error: Could not connect to API. Showing demo salons.`);
+                renderSalonCards(demoSalons); // Fallback to showing demo salons on network error
+            }
+        }
+
+        // --- 4. GEOLOCATION LOGIC ---
+        // Function to attempt getting the user's current location
+        function getUserLocation(callback) {
+            // Default to mock Raipur location and call the callback immediately
+            userLatitude = MOCK_RAIPUR_LAT;
+            userLongitude = MOCK_RAIPUR_LON;
+            updateLocationStatus('info', '📍', `Showing salons near Raipur (Demo Location).`);
+            callback(userLatitude, userLongitude);
+
+            // --- Real Geolocation Logic (Currently commented out) ---
+            /*
+            updateLocationStatus('info', '🕒', 'Attempting to get your precise location...');
+            if (navigator.geolocation) { // Check if browser supports Geolocation API
+                navigator.geolocation.getCurrentPosition(
+                    (position) => { // Success callback
+                        userLatitude = position.coords.latitude;
+                        userLongitude = position.coords.longitude;
+                        updateLocationStatus('success', '✅', `Location acquired. Lat: ${userLatitude.toFixed(3)}, Lon: ${userLongitude.toFixed(3)}`);
+                        callback(userLatitude, userLongitude); // Call the main fetch function with real coordinates
+                    },
+                    (error) => { // Error callback
+                        console.error("Geolocation Error:", error.message);
+                        updateLocationStatus('error', '❌', `Geolocation denied or failed. Falling back to Raipur.`);
+                        userLatitude = MOCK_RAIPUR_LAT; // Fallback to mock coordinates
+                        userLongitude = MOCK_RAIPUR_LON;
+                        callback(userLatitude, userLongitude); // Call the main fetch function with mock coordinates
+                    },
+                    { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 } // Geolocation options
+                );
+            } else { // If browser doesn't support geolocation
+                updateLocationStatus('error', '❌', `Geolocation not supported by your browser. Falling back to Raipur.`);
+                userLatitude = MOCK_RAIPUR_LAT; // Fallback to mock coordinates
+                userLongitude = MOCK_RAIPUR_LON;
+                callback(userLatitude, userLongitude); // Call the main fetch function with mock coordinates
+            }
+            */
+            // --- End Real Geolocation Logic ---
+        }
+
+        // --- 5. INITIALIZATION AND EVENT LISTENERS ---
+        // Function to trigger fetching/filtering salons based on current UI state
+        function applyFilters() {
+            const searchTerm = salonSearchInput.value.trim();
+            const serviceFilter = serviceFilterSelect.value;
+            const sortBy = sortBySelect.value;
+            fetchSalons(userLatitude, userLongitude, searchTerm, serviceFilter, sortBy);
+        }
+
+        // --- Run on page load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Basic Setup (Logout, Sidebar Toggle, Theme) ---
+            // Logout logic
+            if (logoutLink) {
+                const customerToken = localStorage.getItem('authToken');
+                const partnerToken = localStorage.getItem('salonAuthToken');
+                if (customerToken || partnerToken) { // Show logout only if logged in
+                    logoutLink.parentElement.style.display = 'block'; // Show the list item
+                    logoutLink.addEventListener('click', (e) => {
+                        e.preventDefault(); // Prevent default link behavior
+                        // Clear all relevant session/user data
+                        localStorage.removeItem('authToken');
+                        localStorage.removeItem('salonAuthToken');
+                        localStorage.removeItem('userName');
+                        localStorage.removeItem('userId');
+                        localStorage.removeItem('salonId');
+                        localStorage.removeItem('salonName');
+                        alert('You have been logged out.');
+                        window.location.href = 'frontpage.html'; // Redirect to front page
+                    });
+                } else {
+                    logoutLink.parentElement.style.display = 'none'; // Hide the list item if not logged in
+                }
+            }
+
+            // Sidebar toggle logic (for desktop)
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    // Add/remove class on body for global CSS rules if needed
+                    document.body.classList.toggle('sidebar-collapsed');
+                });
+                // Check initial state (e.g., if you want it collapsed by default sometimes)
+                // if (/* some condition */) {
+                //    sidebar.classList.add('collapsed');
+                //    document.body.classList.add('sidebar-collapsed');
+                // }
+            }
+
+            // Theme toggle logic (applies theme from localStorage and sets button icon)
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const currentTheme = document.body.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.body.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙'; // Update icon
+                });
+            }
+            // Apply initial theme from localStorage or default to 'light'
+            const storedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', storedTheme);
+            if (themeToggleBtn) {
+                themeToggleBtn.textContent = storedTheme === 'dark' ? '☀️' : '🌙';
+            }
+
+            // --- Sidebar Active State ---
+            // Set the 'active' class on the correct sidebar item for the current page
+            const currentPage = 'salons.html'; // This page is salons.html
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                li.classList.remove('active'); // Remove active class from all first
+                if (li.getAttribute('data-page') === currentPage) {
+                    li.classList.add('active'); // Add active class to the current page's item
+                }
+            });
+
+            // --- Initial Data Load ---
+            // Get user location (using mock or real) and then fetch/filter salons
+            getUserLocation((lat, lon) => {
+                applyFilters(); // Call applyFilters which uses current filter/sort values
+            });
+
+            // --- Add Event Listeners for Filters ---
+            // Trigger applyFilters whenever a filter/sort control changes or search input is typed into
+            applyFiltersBtn.addEventListener('click', applyFilters); // Button click
+            salonSearchInput.addEventListener('input', applyFilters); // Search input typing
+            serviceFilterSelect.addEventListener('change', applyFilters); // Service dropdown change
+            sortBySelect.addEventListener('change', applyFilters); // Sort dropdown change
+        });
+    </script>
+</body>
+</html>

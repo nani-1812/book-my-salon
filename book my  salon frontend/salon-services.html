@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Services | Salon Partner</title>
+    <link rel="stylesheet" href="global.css" />
+    <style>
+        main {
+            margin-left: 240px; 
+            transition: margin-left 0.3s ease;
+            flex: 1;
+            padding: 2rem;
+        }
+        .services-container {
+            padding: 1rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+        .service-list {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px var(--card-shadow);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .service-header, .service-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 0.5fr; /* Service Name, Price, Actions */
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .service-header {
+            background: var(--bg-secondary);
+            font-weight: bold;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        .service-item input[type="text"],
+        .service-item input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .service-item .action-buttons button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .service-item .action-buttons button:hover {
+            background-color: var(--accent-dark);
+        }
+        .service-item .action-buttons button.delete {
+            background-color: var(--danger-color);
+        }
+        .service-item .action-buttons button.delete:hover {
+            background-color: #c82333;
+        }
+
+        .add-service-form {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px var(--card-shadow);
+            margin-top: 2rem;
+        }
+        .add-service-form h3 {
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+        .add-service-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .add-service-form input[type="text"],
+        .add-service-form input[type="number"] {
+            width: calc(100% - 1.5rem); /* Adjust for padding */
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .add-service-form button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        .add-service-form button:hover {
+            background-color: var(--accent-dark);
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin-left: 0;
+            }
+            .service-header { display: none; }
+            .service-item {
+                grid-template-columns: 1fr;
+                flex-direction: column;
+                align-items: flex-start;
+                border-bottom: 1px solid var(--border-color);
+                padding: 1rem;
+            }
+            .service-item > div { width: 100%; margin-bottom: 0.5rem; }
+            .service-item .action-buttons {
+                display: flex;
+                justify-content: flex-end;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <button class="toggle-btn" id="toggleBtn">&#9776;</button>
+        <a href="frontpage.html" class="logo">Book My Salon</a>
+        <div id="themeToggleContainer">
+            <button id="themeToggle" class="toggle-btn" style="position: static; margin-left: 20px;">🌙</button>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+        <ul>
+            <li data-page="salon-dashboard.html"><a href="salon-dashboard.html"><i>💼</i><span>Salon Dashboard</span></a></li>
+            <li data-page="salon-appointments.html"><a href="salon-appointments.html"><i>📅</i><span>Manage Bookings</span></a></li>
+            <li data-page="salon-services.html" class="active"><a href="salon-services.html"><i>✂️</i><span>Edit Services</span></a></li>
+            <li data-page="salon-reports.html"><a href="salon-reports.html"><i>📊</i><span>Reports</span></a></li>
+            <li data-action="logout"><a href="#"><i>🚪</i><span>Log Out</span></a></li>
+        </ul>
+    </aside>
+
+    <main>
+        <div class="services-container">
+            <h2>Your Salon Services</h2>
+
+            <div class="service-list">
+                <div class="service-header">
+                    <div>Service Name</div>
+                    <div>Price (₹)</div>
+                    <div>Actions</div>
+                </div>
+                <div id="servicesBody">
+                    <p style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading services...</p>
+                </div>
+            </div>
+
+            <div class="add-service-form">
+                <h3>Add New Service</h3>
+                <label for="newServiceName">Service Name:</label>
+                <input type="text" id="newServiceName" placeholder="e.g., Men's Haircut" required />
+                <label for="newServicePrice">Price (₹):</label>
+                <input type="number" id="newServicePrice" placeholder="e.g., 350" required min="0" />
+                <button onclick="addNewService()">Add Service</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const SALON_API_BASE_URL = 'http://localhost:3000';
+
+        function checkSalonAuthentication() {
+            const salonToken = localStorage.getItem('salonAuthToken');
+            const salonId = localStorage.getItem('salonId');
+            if (!salonToken || !salonId) {
+                window.location.href = 'frontpage.html';
+                return false;
+            }
+            return salonId;
+        }
+
+        async function fetchSalonServices(salonId) {
+            const salonToken = localStorage.getItem('salonAuthToken');
+            try {
+                // Fetch salon details which include services
+                const response = await fetch(`${SALON_API_BASE_URL}/api/salon/dashboard/${salonId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${salonToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    renderServices(result.salon.services); // Services array is directly in salon object
+                } else {
+                    console.error("Failed to load services:", result.message || "Unknown error");
+                    document.getElementById('servicesBody').innerHTML = `<p style="text-align: center; padding: 2rem; color: var(--danger-color);">Error: ${result.message || 'Failed to load services.'}</p>`;
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.removeItem('salonAuthToken');
+                        localStorage.removeItem('salonId');
+                        localStorage.removeItem('salonName');
+                        window.location.href = 'frontpage.html';
+                    }
+                }
+            } catch (error) {
+                console.error("Network error during services fetch:", error);
+                document.getElementById('servicesBody').innerHTML = `<p style="text-align: center; padding: 2rem; color: var(--danger-color);">Network error. Could not connect to the API.</p>`;
+            }
+        }
+
+        function renderServices(services) {
+            const servicesBody = document.getElementById('servicesBody');
+            servicesBody.innerHTML = '';
+
+            if (services && services.length > 0) {
+                services.forEach(service => {
+                    const item = document.createElement('div');
+                    item.classList.add('service-item');
+                    item.innerHTML = `
+                        <div><input type="text" value="${service.serviceName}" id="serviceName_${service._id}" /></div>
+                        <div><input type="number" value="${service.price}" id="servicePrice_${service._id}" min="0" /></div>
+                        <div class="action-buttons">
+                            <button onclick="updateService('${service._id}')">Update</button>
+                            <button onclick="deleteService('${service._id}')" class="delete">Delete</button>
+                        </div>
+                    `;
+                    servicesBody.appendChild(item);
+                });
+            } else {
+                servicesBody.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No services added yet. Use the form below to add some.</p>';
+            }
+        }
+
+        async function updateService(serviceId) {
+            const salonId = checkSalonAuthentication();
+            if (!salonId) return;
+
+            const salonToken = localStorage.getItem('salonAuthToken');
+            const newName = document.getElementById(`serviceName_${serviceId}`).value;
+            const newPrice = parseFloat(document.getElementById(`servicePrice_${serviceId}`).value);
+
+            if (!newName || isNaN(newPrice) || newPrice < 0) {
+                alert('Please enter a valid service name and price.');
+                return;
+            }
+
+            try {
+                // In a real application, you would send a PUT request to update a specific service
+                // For now, let's assume an update API like /api/salon/:id/services
+                // Since our current backend doesn't have an explicit 'update service' endpoint for salons,
+                // we'll simulate by re-fetching. In a full implementation, you'd send this to an API.
+                alert('Update functionality is placeholder. Backend API for updating individual services not yet implemented.');
+                // Placeholder for actual API call:
+                /*
+                const response = await fetch(`${SALON_API_BASE_URL}/api/salon/${salonId}/services/${serviceId}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${salonToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ serviceName: newName, price: newPrice })
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert('Service updated successfully!');
+                    fetchSalonServices(salonId); // Refresh list
+                } else {
+                    alert('Failed to update service: ' + (result.message || 'Unknown error'));
+                }
+                */
+            } catch (error) {
+                console.error("Network error during service update:", error);
+                alert("Network error. Could not connect to the API.");
+            }
+        }
+
+        async function deleteService(serviceId) {
+            const salonId = checkSalonAuthentication();
+            if (!salonId) return;
+
+            const salonToken = localStorage.getItem('salonAuthToken');
+            if (!confirm('Are you sure you want to delete this service?')) {
+                return;
+            }
+
+            try {
+                // In a real application, you would send a DELETE request for a specific service
+                // For now, let's simulate.
+                alert('Delete functionality is placeholder. Backend API for deleting individual services not yet implemented.');
+                // Placeholder for actual API call:
+                /*
+                const response = await fetch(`${SALON_API_BASE_URL}/api/salon/${salonId}/services/${serviceId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${salonToken}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    alert('Service deleted successfully!');
+                    fetchSalonServices(salonId); // Refresh list
+                } else {
+                    alert('Failed to delete service: ' + (result.message || 'Unknown error'));
+                }
+                */
+            } catch (error) {
+                console.error("Network error during service deletion:", error);
+                alert("Network error. Could not connect to the API.");
+            }
+        }
+
+        async function addNewService() {
+            const salonId = checkSalonAuthentication();
+            if (!salonId) return;
+
+            const salonToken = localStorage.getItem('salonAuthToken');
+            const newServiceNameInput = document.getElementById('newServiceName');
+            const newServicePriceInput = document.getElementById('newServicePrice');
+
+            const newName = newServiceNameInput.value.trim();
+            const newPrice = parseFloat(newServicePriceInput.value);
+
+            if (!newName || isNaN(newPrice) || newPrice < 0) {
+                alert('Please enter a valid service name and price for the new service.');
+                return;
+            }
+
+            try {
+                // To add a new service, you would typically have a dedicated API endpoint for it.
+                // Our current /api/salon/register handles initial services.
+                // For dynamic additions, you'd need a PUT/POST to /api/salon/:id/services
+                alert('Add Service functionality is placeholder. Backend API for adding services to an existing salon not yet implemented.');
+                
+                // Clear form for next entry
+                newServiceNameInput.value = '';
+                newServicePriceInput.value = '';
+
+                // After adding, refresh the list
+                // fetchSalonServices(salonId); 
+            } catch (error) {
+                console.error("Network error during adding new service:", error);
+                alert("Network error. Could not connect to the API.");
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentSalonId = checkSalonAuthentication();
+            if (currentSalonId) {
+                fetchSalonServices(currentSalonId);
+            }
+
+            // Theme/Sidebar/Logout Logic (Copied from salon-dashboard.html)
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            themeToggle.addEventListener('click', () => {
+                const newTheme = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+            
+            if (window.innerWidth > 768) {
+                if (localStorage.getItem('sidebarState') === 'collapsed') sidebar.classList.add('collapsed');
+            }
+            
+            toggleBtn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('active');
+                    document.body.classList.toggle('sidebar-active');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+                }
+            });
+
+            document.querySelectorAll('li[data-action="logout"] a').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('salonAuthToken');
+                    localStorage.removeItem('salonId');
+                    localStorage.removeItem('salonName');
+                    window.location.href = 'frontpage.html';
+                });
+            });
+            
+            const currentPage = window.location.pathname.split('/').pop() || 'salon-dashboard.html';
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                li.classList.toggle('active', li.getAttribute('data-page') === currentPage);
+            });
+        });
+    </script>
+</body>
+</html>

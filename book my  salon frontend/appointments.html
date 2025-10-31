@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Appointments | Book My Salon</title>
+    <link rel="stylesheet" href="global.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* appointments.html specific styles */
+        /* Theme variables are now exclusively managed in global.css, no duplicates needed here. */
+        
+        /* Styles for the content container *within* the main-content-area */
+        .appointments-container {
+            padding: 3rem 2rem; /* Add padding inside the main content area */
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .appointments-container h1 {
+            color: var(--accent-primary); /* Uses variable from global.css */
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+        
+        .appointment-card {
+            background: var(--card-bg); /* Uses variable from global.css */
+            padding: 1.5rem;
+            border-radius: var(--border-radius); /* Use global variable */
+            box-shadow: 0 2px 10px var(--card-shadow); /* Uses variable from global.css */
+            margin-bottom: 1rem;
+            border-left: 5px solid var(--accent-primary); /* Uses variable from global.css */
+            transition: all 0.3s;
+        }
+        .appointment-card:hover {
+            box-shadow: 0 4px 15px var(--card-shadow); /* Uses variable from global.css */
+            transform: translateY(-2px);
+        }
+        .appointment-card h3 {
+            margin-top: 0;
+            color: var(--text-heading); /* Use global variable */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .appointment-card p {
+            color: var(--text-secondary); /* Uses variable from global.css */
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        /* Status colors - kept here as requested */
+        .status-upcoming { background-color: #4a9eff; color: white; } /* Confirmed/Upcoming */
+        .status-pending { background-color: #ffc107; color: #333; } /* For Cash on Service */
+        .status-completed { background-color: #4caf50; color: white; }
+        .status-cancelled { background-color: #f44336; color: white; }
+        
+        /* Styles for filter section */
+        .filters-sort-section { /* Added basic styling for filters */
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-small);
+        }
+        .filters-sort-section select,
+        .filters-sort-section button {
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+        }
+        .filters-sort-section button {
+            background-color: var(--accent-primary);
+            color: var(--button-text);
+            cursor: pointer;
+        }
+        .filters-sort-section button:hover {
+             background-color: var(--accent-dark-hover);
+        }
+
+        /* Message for no appointments */
+        .info-message {
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-secondary);
+        }
+        .info-message a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .info-message a:hover {
+            text-decoration: underline;
+        }
+
+        /* List container */
+        .appointments-list {
+             margin-top: 1rem;
+        }
+
+        /* Action buttons within cards */
+        .appointment-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .appointment-actions button {
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s ease;
+        }
+        .appointment-actions .cancel-btn {
+             background-color: #f44336; /* Red */
+             color: white;
+        }
+        .appointment-actions .cancel-btn:hover {
+            background-color: #d32f2f;
+        }
+        .appointment-actions .rate-btn {
+            background-color: #ffc107; /* Amber */
+            color: #333;
+        }
+        .appointment-actions .rate-btn:hover {
+             background-color: #ffa000;
+        }
+         .appointment-actions .view-salon-btn {
+            background-color: var(--primary-color); /* Theme primary */
+            color: var(--button-text);
+        }
+        .appointment-actions .view-salon-btn:hover {
+            background-color: var(--primary-color-dark);
+        }
+
+    </style>
+</head>
+<body data-theme="light">
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="frontpage.html" class="logo">Book My Salon</a>
+                <button class="toggle-btn" id="toggleBtn" title="Toggle Sidebar">☰</button>
+            </div>
+            <ul>
+                <li data-page="dashboard.html"><a href="dashboard.html"><i class="icon-home"></i><span>Dashboard</span></a></li>
+                <li data-page="salons.html"><a href="salons.html"><i class="icon-barber"></i><span>Salons</span></a></li>
+                <li data-page="appointments.html" class="active"><a href="appointments.html"><i class="icon-calendar"></i><span>My Appointments</span></a></li>
+                <li data-page="profile.html"><a href="profile.html"><i class="icon-user"></i><span>Profile</span></a></li>
+                <li data-page="salon-register.html"><a href="salon-register.html"><i class="icon-register"></i><span>Register Salon</span></a></li>
+                <li data-action="logout"><a href="#"><i class="icon-logout"></i><span>Logout</span></a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content-area">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    </div>
+                <div class="header-right">
+                    <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+                     <button id="logoutBtn" class="btn btn-logout" style="margin-left: 1rem;">Logout</button>
+                </div>
+            </header>
+
+            <main>
+                <div class="appointments-container">
+                    <h1>Your Appointments</h1>
+
+                    <div class="filters-sort-section">
+                        <select id="statusFilter">
+                            <option value="">All Statuses</option>
+                            <option value="scheduled">Scheduled</option> <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="pending">Pending</option> </select>
+                        <select id="sortBy">
+                            <option value="date-desc">Date (Newest First)</option>
+                            <option value="date-asc">Date (Oldest First)</option>
+                        </select>
+                        <button id="applyFilters">Apply</button>
+                    </div>
+
+                     <div id="noAppointmentsMessage" class="info-message" style="display: none;">
+                        <p>You have no appointments yet. <a href="salons.html">Book one now!</a></p>
+                    </div>
+
+                    <div id="appointmentsList" class="appointments-list">
+                        </div>
+
+                </div>
+            </main>
+
+            <footer>
+                <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+            </footer>
+        </div> </div> <script src="theme-switcher.js"></script>
+    <script>
+        // === CONFIGURATION ===
+        const API_BASE_URL = 'http://localhost:3000'; // Define API base URL here
+
+        // --- AUTH CHECK: CRITICAL LOGIC ---
+        // Function to check if the user is logged in (has authToken)
+        function checkAuth() {
+            const userToken = localStorage.getItem('authToken');
+            if (!userToken) {
+                // If not logged in, alert the user and redirect to the front page
+                alert('You must be logged in to view your appointments.');
+                window.location.href = 'frontpage.html';
+            }
+        }
+        checkAuth(); // Run the auth check immediately
+
+        // --- UI ELEMENT REFERENCES --- (Get references after auth check)
+        const statusFilterSelect = document.getElementById('statusFilter');
+        const sortBySelect = document.getElementById('sortBy');
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        const appointmentsListDiv = document.getElementById('appointmentsList');
+        const noAppointmentsMessageDiv = document.getElementById('noAppointmentsMessage');
+        const logoutBtn = document.getElementById('logoutBtn'); // Reference the new logout button
+        const sidebar = document.getElementById('sidebar'); // Sidebar element
+        const toggleBtn = document.getElementById('toggleBtn'); // Sidebar toggle button
+        const themeToggleBtn = document.getElementById('themeToggle'); // Theme toggle button
+
+        // --- LOGOUT LOGIC ---
+        // Add event listener to the logout button
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('authToken'); // Clear user token
+            localStorage.removeItem('userName'); // Clear user name
+            // Add other relevant localStorage keys to clear if needed (e.g., userId)
+            window.location.href = 'frontpage.html'; // Redirect to front page
+        });
+
+        // --- HELPER FUNCTIONS ---
+        // (Helper functions: formatServices, formatDate, formatTime - remain unchanged)
+        function formatServices(services) {
+             if (Array.isArray(services)) {
+                return services.map(s => s.name || s.serviceName).join(', ');
+            } else if (typeof services === 'object' && services !== null && services.serviceName) {
+                // Handle case where booking.service is an object directly
+                return services.serviceName;
+            }
+            return services || 'N/A';
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            try {
+                 return new Date(dateString).toLocaleDateString(undefined, options);
+            } catch (e) {
+                 return "Invalid Date";
+            }
+        }
+
+        function formatTime(timeString) {
+            if (!timeString || !timeString.includes(':')) return "N/A";
+            const [hours, minutes] = timeString.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours);
+            date.setMinutes(minutes);
+            return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        }
+
+
+        // --- UI RENDERING FUNCTIONS ---
+        // (renderAppointments function - remains largely unchanged, might need adjustments based on actual API response)
+        function renderAppointments(appointmentsToRender) {
+            appointmentsListDiv.innerHTML = ''; // Clear previous list
+
+            if (!appointmentsToRender || appointmentsToRender.length === 0) {
+                noAppointmentsMessageDiv.style.display = 'block';
+                return;
+            } else {
+                noAppointmentsMessageDiv.style.display = 'none';
+            }
+
+            appointmentsToRender.forEach(appointment => {
+                const appointmentCard = document.createElement('div');
+                const status = (appointment.status || 'Unknown').toLowerCase(); // Normalize status
+                appointmentCard.classList.add('appointment-card', status);
+
+                // Determine status badge class based on normalized status
+                let statusClass = '';
+                if (status === 'confirmed' || status === 'scheduled') { // Treat 'confirmed' as 'scheduled'
+                    statusClass = 'status-upcoming';
+                } else if (status === 'pending') {
+                    statusClass = 'status-pending';
+                } else if (status === 'completed') {
+                    statusClass = 'status-completed';
+                } else if (status === 'cancelled') {
+                    statusClass = 'status-cancelled';
+                }
+
+                const servicesDisplay = formatServices(appointment.services || appointment.service); // Handle both array and single object
+                const totalPrice = appointment.totalPrice || (appointment.service ? appointment.service.price : 0); // Calculate price if needed
+
+                appointmentCard.innerHTML = `
+                    <div class="appointment-header">
+                        <h3>${appointment.salonName || 'Salon Name Missing'}</h3>
+                        <span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                    </div>
+                    <div class="appointment-details">
+                        <p><strong>Service(s):</strong> ${servicesDisplay}</p>
+                        <p><strong>Date:</strong> ${formatDate(appointment.date)}</p>
+                        <p><strong>Time:</strong> ${formatTime(appointment.time)}</p>
+                        <p><strong>Total Price:</strong> ₹${totalPrice ? totalPrice.toFixed(2) : 'N/A'}</p>
+                        <p><strong>Address:</strong> ${appointment.salonAddress || 'Address Not Available'}</p>
+                         <p><strong>Payment Method:</strong> ${appointment.paymentMethod ? appointment.paymentMethod.toUpperCase() : 'N/A'}</p>
+                    </div>
+                    <div class="appointment-actions">
+                        ${status === 'scheduled' || status === 'confirmed' ?
+                            `<button class="cancel-btn" data-id="${appointment._id}">Cancel Appointment</button>` : ''
+                        }
+                        ${status === 'completed' ?
+                            `<button class="rate-btn" data-id="${appointment._id}">Rate Salon</button>` : ''
+                        }
+                        <button class="view-salon-btn" data-salon-id="${appointment.salonId}">View Salon</button>
+                    </div>
+                `;
+                appointmentsListDiv.appendChild(appointmentCard);
+            });
+
+            addAppointmentCardEventListeners(); // Attach listeners after rendering
+        }
+
+        // (addAppointmentCardEventListeners function - remains unchanged)
+         function addAppointmentCardEventListeners() {
+            document.querySelectorAll('.cancel-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const appointmentId = e.target.dataset.id;
+                    if (confirm('Are you sure you want to cancel this appointment?')) {
+                        cancelAppointment(appointmentId);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.rate-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const appointmentId = e.target.dataset.id;
+                    alert(`Rating functionality for appointment ${appointmentId} coming soon!`);
+                });
+            });
+
+            document.querySelectorAll('.view-salon-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const salonId = e.target.dataset.salonId;
+                    if (salonId && salonId !== 'undefined') { // Check if salonId is valid
+                        window.location.href = `salon-details.html?id=${salonId}`;
+                    } else {
+                         alert('Salon details are currently unavailable.');
+                    }
+                });
+            });
+        }
+
+        // --- DATA FETCHING AND MANIPULATION LOGIC ---
+        // Function to fetch appointments from the backend
+        async function fetchAppointments() {
+            appointmentsListDiv.innerHTML = '<p>Loading appointments...</p>'; // Show loading state
+            noAppointmentsMessageDiv.style.display = 'none';
+
+            const token = localStorage.getItem('authToken');
+            if (!token) return; // Auth check already redirects, but good practice
+
+            const status = statusFilterSelect.value;
+            const sortBy = sortBySelect.value;
+
+            // Construct API URL with query parameters for filtering and sorting
+            let url = new URL(`${API_BASE_URL}/api/bookings/my-appointments`); // Endpoint for user's appointments
+            if (status) url.searchParams.append('status', status);
+            if (sortBy) url.searchParams.append('sort', sortBy);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Send JWT token for authentication
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && Array.isArray(data.bookings)) {
+                        renderAppointments(data.bookings); // Render fetched appointments
+                    } else {
+                        throw new Error(data.message || 'Failed to load appointments data.');
+                    }
+                } else if (response.status === 401 || response.status === 403) {
+                     // Handle unauthorized access (e.g., expired token)
+                     localStorage.removeItem('authToken');
+                     alert('Session expired. Please log in again.');
+                     window.location.href = 'frontpage.html';
+                }
+                 else {
+                     throw new Error(`API Error: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Error fetching appointments:', error);
+                appointmentsListDiv.innerHTML = `<p style="color: red;">Could not load appointments: ${error.message}</p>`;
+                noAppointmentsMessageDiv.style.display = 'none';
+            }
+        }
+
+        // Function to handle appointment cancellation
+        async function cancelAppointment(appointmentId) {
+             const token = localStorage.getItem('authToken');
+            if (!token) return;
+
+            try {
+                 // Endpoint might be something like PATCH /api/bookings/:id/cancel
+                 const response = await fetch(`${API_BASE_URL}/api/bookings/${appointmentId}/cancel`, {
+                    method: 'PATCH', // Or PUT, depending on your backend design
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alert('Appointment cancelled successfully!');
+                    fetchAppointments(); // Refresh the list
+                } else {
+                    throw new Error(data.message || 'Failed to cancel appointment.');
+                }
+            } catch (error) {
+                 console.error('Error cancelling appointment:', error);
+                 alert(`Could not cancel appointment: ${error.message}`);
+            }
+        }
+
+        // --- INITIALIZATION AND EVENT LISTENERS ---
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Sidebar and Theme Setup ---
+            // (Sidebar toggle logic for desktop remains the same)
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    document.body.classList.toggle('sidebar-collapsed');
+                });
+            }
+
+            // (Theme toggle logic remains the same)
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const currentTheme = document.body.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.body.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+                });
+            }
+            const storedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', storedTheme);
+            if (themeToggleBtn) {
+                themeToggleBtn.textContent = storedTheme === 'dark' ? '☀️' : '🌙';
+            }
+
+            // --- Sidebar Active State ---
+            // Set the 'active' class on the correct sidebar item for the current page
+             const currentPage = 'appointments.html'; // This page is appointments.html
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                 li.classList.remove('active'); // Remove active class from all first
+                if (li.getAttribute('data-page') === currentPage) {
+                     li.classList.add('active'); // Add active class to the current page's item
+                }
+            });
+
+             // --- Initial Data Load ---
+             fetchAppointments(); // Fetch appointments when the page loads
+
+             // --- Add Event Listeners for Filters ---
+             applyFiltersBtn.addEventListener('click', fetchAppointments); // Re-fetch when Apply is clicked
+             statusFilterSelect.addEventListener('change', fetchAppointments); // Optionally re-fetch on change
+             sortBySelect.addEventListener('change', fetchAppointments); // Optionally re-fetch on change
+        });
+
+        // --- Mobile Sidebar Logic --- (Add this if needed for consistency)
+        document.addEventListener('DOMContentLoaded', () => {
+            // (Include the mobile sidebar toggle and overlay logic from salons.html if needed)
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('toggleBtn'); // Use the same toggle button ID
+            const body = document.body;
+
+             if (window.innerWidth <= 768) {
+                sidebar.classList.add('collapsed'); // Start collapsed on mobile
+
+                sidebarToggle.addEventListener('click', (e) => {
+                    // Prevent desktop toggle logic if already handled
+                    e.stopPropagation(); // Stop event from bubbling if handled here
+                    sidebar.classList.toggle('active'); // Use 'active' for mobile show/hide
+                    body.classList.toggle('sidebar-active'); // For overlay
+                });
+
+                // Close sidebar when clicking outside (on the overlay)
+                body.addEventListener('click', (event) => {
+                    if (body.classList.contains('sidebar-active') &&
+                        !sidebar.contains(event.target) &&
+                        !sidebarToggle.contains(event.target)) {
+                        sidebar.classList.remove('active');
+                        body.classList.remove('sidebar-active');
+                    }
+                });
+            } else {
+                 // Ensure desktop toggle works if not mobile
+                sidebarToggle.addEventListener('click', () => {
+                     sidebar.classList.toggle('collapsed');
+                     body.classList.toggle('sidebar-collapsed');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

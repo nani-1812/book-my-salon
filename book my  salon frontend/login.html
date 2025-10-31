@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Book My Salon</title>
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- Refined CSS for login.html --- */
+
+        /* Main container alignment */
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Ensures it takes up space to push footer down */
+            padding: 3rem 1rem; /* More padding top/bottom, less side on small screens */
+            background-color: var(--bg-color); /* Use theme background */
+        }
+
+        /* Login form container */
+        .login-container {
+            background: var(--card-bg);
+            padding: 2.5rem 3rem; /* Adjusted padding */
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-medium); /* Use theme shadow */
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box; /* Include padding in width calculation */
+            animation: fadeIn 0.5s ease-out; /* Add a subtle fade-in */
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Heading styling */
+        .login-container h2 {
+            color: var(--primary-color); /* Use theme primary color */
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600; /* Slightly bolder */
+        }
+
+        /* Subtitle styling */
+        .login-container .subtitle {
+            color: var(--text-secondary); /* Use theme secondary text color */
+            margin-bottom: 2.5rem; /* Increased space below subtitle */
+            font-size: 1rem;
+        }
+
+        /* Form group styling */
+        .form-group {
+            margin-bottom: 1.8rem; /* Increased space between form groups */
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        /* Phone input group styling */
+        .phone-input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--input-bg); /* Use theme input background */
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        /* Focus state for the input group */
+        .phone-input-group:focus-within {
+             border-color: var(--primary-color);
+             box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 247, 107, 28), 0.2); /* Use primary color with alpha, fallback needed */
+        }
+        /* Define --primary-color-rgb in :root if not present, e.g., --primary-color-rgb: 247, 107, 28; */
+
+
+        .phone-input-group .country-code {
+            padding: 0.9rem 1.1rem; /* Slightly adjusted padding */
+            color: var(--text-secondary); /* Use secondary text for code */
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-secondary, #e9ecef); /* Use a secondary background, fallback added */
+            font-weight: 500;
+        }
+
+        .phone-input-group input[type="tel"] {
+            flex-grow: 1;
+            border: none;
+            padding: 0.9rem 1.1rem; /* Match country code padding */
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        /* OTP input styling (similar to phone input) */
+        #otpVerificationSection input[type="text"] {
+             padding: 0.9rem 1.1rem;
+             border: 1px solid var(--border-color);
+             border-radius: var(--border-radius);
+             background-color: var(--input-bg);
+             color: var(--text-primary);
+             font-size: 1rem;
+             outline: none;
+             width: 100%; /* Make it full width */
+             box-sizing: border-box; /* Include padding/border in width */
+             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+         #otpVerificationSection input[type="text"]:focus {
+             border-color: var(--primary-color);
+             box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 247, 107, 28), 0.2);
+        }
+
+
+        /* Validation and API message styling */
+        .validation-message, #apiMessage {
+            min-height: 1.2em;
+            margin-top: 0.6rem;
+            font-size: 0.9em;
+            color: var(--error-color, red); /* Use theme error color with fallback */
+        }
+        #apiMessage.success { /* Style for success messages */
+             color: var(--accent-color, green); /* Use theme accent/success color */
+        }
+
+
+        /* Button container styling */
+        .choice-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem; /* Increased space above buttons */
+            margin-bottom: 1.5rem; /* Space below choice buttons */
+        }
+
+        /* General button styling adjustments (inherits base from global.css) */
+        .btn {
+            padding: 0.9rem 1rem; /* Adjusted padding */
+            font-size: 1rem;
+            font-weight: 600;
+            flex: 1; /* Make buttons take equal width */
+            text-align: center;
+            border: 1px solid transparent; /* Ensure border consistency */
+        }
+
+        /* Specific button styling */
+        .btn-primary {
+             background-color: var(--primary-color);
+             color: var(--button-text);
+             border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-color-dark);
+            border-color: var(--primary-color-dark);
+        }
+        .btn-primary:disabled {
+            background-color: var(--border-color);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-secondary:hover {
+             background-color: var(--primary-color);
+             color: var(--button-text);
+        }
+         .btn-secondary:disabled {
+             background-color: transparent;
+             border-color: var(--border-color);
+             color: var(--text-secondary);
+             cursor: not-allowed;
+             opacity: 0.7;
+         }
+
+
+        /* Verify button styling */
+        #verifyBtn {
+             width: 100%; /* Make verify button full width */
+             margin-top: 1rem;
+        }
+
+        /* Signup/Register links styling */
+        .register-link-container,
+        .partner-link {
+            display: block; /* Ensure they are on separate lines */
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .register-link-container a,
+        .partner-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .register-link-container a:hover,
+        .partner-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 2rem 1.5rem; /* Reduce padding on smaller screens */
+            }
+            .login-container h2 {
+                 font-size: 1.8rem;
+            }
+            .choice-buttons {
+                flex-direction: column; /* Stack buttons vertically */
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <a href="frontpage.html" class="logo">Book My Salon</a>
+        <div class="header-controls">
+            <div class="header-actions">
+                <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="login-container">
+            <h2>Welcome Back!</h2>
+            <p class="subtitle">Login to access your bookings or manage your salon.</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="phone-input-group">
+                        <span class="country-code">+91</span>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Enter your 10-digit phone number"
+                            maxlength="10"
+                            pattern="[0-9]{10}"
+                            autocomplete="tel"
+                            required
+                        />
+                    </div>
+                    <div class="validation-message" id="phoneError"></div>
+                </div>
+
+                <div id="otpVerificationSection" style="display:none;" class="form-group">
+                    <label for="otpInput">Enter OTP</label>
+                    <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" required maxlength="6" pattern="[0-9]{6}"/>
+                    <div class="validation-message" id="otpError"></div>
+                </div>
+
+                <div id="apiMessage" class="validation-message"></div>
+
+                <div class="choice-buttons">
+                    <button type="button" class="btn btn-primary" id="sendOtpCustomerBtn" data-mode="user-login">Send OTP as Customer</button>
+                    <button type="button" class="btn btn-secondary" id="sendOtpPartnerBtn" data-mode="salon-login">Send OTP as Partner</button>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="verifyBtn" style="display:none; margin-top: 1rem;">Verify and Login</button>
+            </form>
+
+            <div class="register-link-container">
+                Don't have an account? <a href="userinfo.html">Sign Up as Customer</a>
+            </div>
+            <a href="salon-register.html" class="partner-link">New Salon Partner? Register here.</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script src="theme-switcher.js"></script>
+    <script>
+        // === CONFIGURATION AND ELEMENT SELECTION ===
+        const API_BASE_URL = 'http://localhost:3000'; // Defines the base URL for all API calls
+        const phoneInput = document.getElementById('phone'); // Gets the phone input field
+        const sendOtpCustomerBtn = document.getElementById('sendOtpCustomerBtn'); // Gets Customer OTP button
+        const sendOtpPartnerBtn = document.getElementById('sendOtpPartnerBtn'); // Gets Partner OTP button
+        const verifyBtn = document.getElementById('verifyBtn'); // Gets the Verify button
+        const otpSection = document.getElementById('otpVerificationSection'); // Gets the hidden OTP input container
+        const otpInput = document.getElementById('otpInput'); // Gets the OTP input field
+        
+        let currentOtpMode = ''; // Stores the selected mode ('user-login' or 'salon-login')
+
+        // === UI UTILITY FUNCTIONS ===
+
+        function updateUIForSending(button, isSending) { 
+            // Manages button state: disables buttons and shows "Sending..." text during API requests.
+            const originalText = button.dataset.originalText || button.textContent;
+            button.dataset.originalText = originalText;
+            button.textContent = isSending ? 'Sending...' : originalText;
+            button.disabled = isSending;
+            sendOtpCustomerBtn.disabled = isSending; // Disabling both send buttons
+            sendOtpPartnerBtn.disabled = isSending;
+        }
+        
+        function displayApiMessage(message, isError = true) { 
+            // Displays messages (error or success) from the API response below the form.
+            const div = document.getElementById('apiMessage');
+            div.textContent = message;
+            // Use specific class for success styling, rely on default for error
+            div.classList.toggle('success', !isError);
+        }
+
+        // === CORE LOGIC: SEND OTP HANDLER (API REQUEST) ===
+        async function sendOtpHandler(mode, button) { 
+            // Function triggered by 'Send OTP' buttons. Validates input and calls the backend.
+            const phoneNumber = phoneInput.value.trim();
+
+            if (phoneNumber.length !== 10 || !/^\d{10}$/.test(phoneNumber)) {
+                displayApiMessage('Please enter a valid 10-digit phone number.');
+                return;
+            }
+            
+            updateUIForSending(button, true); // Visual feedback: change button text
+            displayApiMessage('', false); // Clear previous messages
+            
+            const fullPhoneNumber = `+91${phoneNumber}`; 
+
+            try {
+                let endpoint = '';
+                // Sets the API endpoint based on the selected mode (Customer or Salon Partner)
+                if (mode.startsWith('user')) {
+                    endpoint = `${API_BASE_URL}/api/auth/send-otp`;
+                } else if (mode.startsWith('salon')) {
+                    endpoint = `${API_BASE_URL}/api/salon/auth/send-otp`;
+                } 
+                
+                // Fetch API call to the backend
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: fullPhoneNumber, mode: mode })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // SUCCESS: OTP sent. Update UI to display the OTP input field.
+                    displayApiMessage('OTP sent successfully! Enter the code to log in.', false);
+                    localStorage.setItem('tempPhoneNumber', phoneNumber); // Store phone temporarily
+                    localStorage.setItem('otpMode', mode); // Store mode for verification
+                    currentOtpMode = mode; 
+                    
+                    otpSection.style.display = 'block'; // Show OTP input field
+                    verifyBtn.style.display = 'block'; // Show Verify button
+                    sendOtpCustomerBtn.style.display = 'none'; // Hide Send OTP buttons
+                    sendOtpPartnerBtn.style.display = 'none';
+
+                } else if (data.action === 'redirect_to_register') { 
+                    // Handles server response indicating the user needs to register
+                    displayApiMessage(data.message || 'Account not found. Redirecting to sign up...', true);
+                    if (mode.startsWith('user')) {
+                        setTimeout(() => { window.location.href = 'userinfo.html'; }, 2000); // Redirect customer to signup
+                    } else if (mode.startsWith('salon')) {
+                        setTimeout(() => { window.location.href = 'salon-register.html'; }, 2000); // Redirect partner to registration
+                    }
+                } 
+                 else {
+                    // General API failure message
+                    displayApiMessage(data.message || 'Failed to send OTP. Please check your number.');
+                }
+
+            } catch (error) {
+                // Catches network errors (client-side failure to connect to API)
+                console.error('Send OTP Error:', error);
+                displayApiMessage('Network error. Could not connect to the server.');
+            } finally {
+                // Ensures buttons are re-enabled if the OTP section wasn't shown (meaning API failed)
+                if (otpSection.style.display !== 'block') {
+                    updateUIForSending(button, false);
+                }
+            }
+        }
+
+        // === CORE LOGIC: VERIFY OTP HANDLER (API REQUEST) ===
+        async function verifyOtpHandler() {
+            // Function triggered by 'Verify and Login'. Sends OTP and phone number to the backend.
+            const phoneNumber = localStorage.getItem('tempPhoneNumber'); // Retrieve phone from storage
+            const otp = otpInput.value.trim(); // Get OTP from input field
+            const mode = localStorage.getItem('otpMode'); // Retrieve mode from storage
+            
+            if (!phoneNumber || !otp || !mode) {
+                displayApiMessage('Verification data missing. Please start over.', true);
+                return;
+            }
+
+            verifyBtn.textContent = 'Verifying...';
+            verifyBtn.disabled = true;
+            displayApiMessage('', false);
+
+            try {
+                let endpoint = '';
+                // Sets the verification API endpoint based on the mode
+                if (mode.startsWith('user')) {
+                    endpoint = `${API_BASE_URL}/api/auth/verify-otp`;
+                } else if (mode.startsWith('salon')) {
+                    endpoint = `${API_BASE_URL}/api/salon/auth/verify-otp`;
+                }
+
+                // Fetch API call to verify the OTP
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber: `+91${phoneNumber}`, otp: otp, mode: mode })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // SUCCESS: Login successful. Store auth token and redirect to dashboard.
+                    displayApiMessage('Login successful! Redirecting to dashboard...', false);
+                    
+                    if (data.token) { 
+                        // Stores necessary tokens/user details in browser storage
+                        if (mode.startsWith('user')) {
+                            localStorage.setItem('authToken', data.token); 
+                            localStorage.setItem('userName', data.user.name || 'Customer'); 
+                            window.location.href = 'dashboard.html';
+                        } else if (mode.startsWith('salon')) {
+                            localStorage.setItem('salonAuthToken', data.token);
+                            localStorage.setItem('salonId', data.salon._id); 
+                            localStorage.setItem('salonName', data.salon.salonName || 'Salon Partner'); 
+                            window.location.href = 'salon-dashboard.html';
+                        }
+                    } else {
+                        displayApiMessage('Login successful, but no token received. Please try again.', true);
+                    }
+                    
+                } else {
+                    // Handles incorrect OTP or other verification failures
+                    displayApiMessage(data.message || 'OTP verification failed. Please try again.');
+                }
+            } catch (error) {
+                // Catches network errors during verification
+                console.error('Verify OTP Error:', error);
+                displayApiMessage('Network error during verification.');
+            } finally {
+                // Resets the Verify button text and re-enables it
+                verifyBtn.textContent = 'Verify and Login';
+                verifyBtn.disabled = false;
+            }
+        }
+
+        // === EVENT LISTENERS ===
+        // Triggers the sendOtpHandler function when either button is clicked
+        sendOtpCustomerBtn.addEventListener('click', (e) => sendOtpHandler(e.currentTarget.dataset.mode, e.currentTarget));
+        sendOtpPartnerBtn.addEventListener('click', (e) => sendOtpHandler(e.currentTarget.dataset.mode, e.currentTarget));
+        
+        // Prevents default form submission and calls the verification handler if OTP section is visible
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (otpSection.style.display === 'block') {
+                verifyOtpHandler();
+            }
+        });
+
+        // Initial setup (Currently empty but serves as a placeholder for tasks like checking login status on load)
+        document.addEventListener('DOMContentLoaded', () => {
+             // You might want to re-check if user is already logged in here
+        });
+    </script>
+</body>
+</html>

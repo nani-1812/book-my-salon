@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Book My Salon</title>
+    <link rel="stylesheet" href="global.css">
+
+    <style>
+        /*
+         * NOTE: It's generally better to move these to global.css if they are common
+         * or to a dashboard.css if specific only to this page and complex.
+         * For now, keeping here as requested, but minimal.
+         */
+
+        /* Main content area when sidebar is expanded */
+        main {
+            margin-left: 240px; /* Default sidebar width */
+            transition: margin-left 0.3s ease;
+            flex: 1; /* Allows main to take available space in flex container */
+            padding: 2rem;
+            display: flex; /* Added for proper layout with footer */
+            flex-direction: column; /* Added for proper layout with footer */
+            min-height: calc(100vh - 80px); /* Adjust based on header/footer height */
+        }
+
+        /* Adjust main content when sidebar is collapsed */
+        body.sidebar-collapsed main {
+            margin-left: 60px; /* Collapsed sidebar width */
+        }
+
+        /* Adjust main content for mobile (when sidebar is active/hidden) */
+        @media (max-width: 768px) {
+            main {
+                margin-left: 0; /* No margin when sidebar is not active */
+                padding: 1rem;
+            }
+            body.sidebar-active main {
+                /* When sidebar is open on mobile, main should be pushed or covered */
+                /* This is handled by global.css overlay usually, not direct margin */
+            }
+        }
+
+        .dashboard-content {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--card-bg); 
+            border-radius: var(--border-radius); /* Using variable */
+            box-shadow: var(--shadow-medium); /* Using variable */
+            max-width: 800px;
+            margin: 0 auto;
+            flex-grow: 1; /* Allows content to push footer down */
+        }
+
+        .dashboard-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-primary); 
+        }
+
+        .dashboard-content button {
+            background-color: var(--accent-primary); 
+            color: white; 
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius); /* Using variable */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 1rem;
+        }
+        .dashboard-content button:hover {
+            background-color: var(--accent-dark); /* Using variable */
+        }
+        
+        .register-salon-btn {
+            background-color: #28a745; /* A standard green color */
+            color: white; 
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius); /* Using variable */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 1rem auto 0 auto; /* Centered and spaced */
+            display: block;
+            width: fit-content; /* Adjust width to content */
+            max-width: 100%; /* Ensure it doesn't overflow */
+        }
+        .register-salon-btn:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="frontpage.html" class="logo">Book My Salon</a>
+                <button class="toggle-btn" id="toggleBtn" title="Toggle Sidebar">☰</button>
+            </div>
+            <ul>
+                <li data-page="dashboard.html"><a href="dashboard.html"><i class="icon-home"></i><span>Dashboard</span></a></li>
+                <li data-page="salons.html"><a href="salons.html"><i class="icon-barber"></i><span>Salons</span></a></li>
+                <li data-page="appointments.html"><a href="appointments.html"><i class="icon-calendar"></i><span>My Appointments</span></a></li>
+                <li data-page="profile.html"><a href="profile.html"><i class="icon-user"></i><span>Profile</span></a></li>
+                <li data-page="salon-register.html"><a href="salon-register.html"><i class="icon-register"></i><span>Register Salon</span></a></li> 
+                <li data-action="logout"><a href="#"><i class="icon-logout"></i><span>Logout</span></a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content-area">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    </div>
+                <div class="header-right">
+                    <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+                </div>
+            </header>
+
+            <main>
+                <section class="dashboard-content">
+                    <h2 id="userName">Welcome, Valued User!</h2>
+                    <p>Your personalized dashboard content will appear here.</p>
+                    
+                    <button onclick="window.location.href='salons.html'">Book a New Appointment</button>
+
+                    <a href="salon-register.html" class="register-salon-btn">Register Your Salon</a>
+                    
+                    <p style="margin-top: 2rem;">Use the navigation on the left to explore more.</p>
+                </section>
+            </main>
+
+            <footer>
+                <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+            </footer>
+    <script src="theme-switcher.js"></script>
+</body>
+</html>

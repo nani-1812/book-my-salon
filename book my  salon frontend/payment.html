@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment | Book My Salon</title>
+    <link rel="stylesheet" href="global.css" />
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: var(--bg-primary);
+        }
+        .payment-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px var(--card-shadow);
+            padding: 2.5rem 3rem;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+        }
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .payment-summary {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 2rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        .payment-summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .payment-summary div span:first-child {
+            font-weight: bold;
+        }
+        .payment-summary .total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+            border-top: 1px dashed var(--border-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        .payment-method-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .payment-method-buttons button {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            color: white;
+        }
+        .payment-method-buttons button:hover {
+            transform: translateY(-2px);
+        }
+        .payment-method-buttons button.upi {
+            background-color: #6a0dad; /* A vibrant purple */
+        }
+        .payment-method-buttons button.upi:hover {
+            background-color: #5a099a;
+        }
+        .payment-method-buttons button.card {
+            background-color: #007bff; /* Blue for card */
+        }
+        .payment-method-buttons button.card:hover {
+            background-color: #0056b3;
+        }
+        .payment-method-buttons button.cash {
+            background-color: #28a745; /* Green for cash */
+        }
+        .payment-method-buttons button.cash:hover {
+            background-color: #218838;
+        }
+
+        .payment-method-buttons button i {
+            font-size: 1.3rem;
+        }
+        .error-message {
+            color: var(--danger-color);
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body data-theme="light">
+    <header>
+        <a href="frontpage.html" class="logo">Book My Salon</a>
+    </header>
+
+    <main>
+        <div class="payment-container">
+            <h2>Complete Your Booking</h2>
+            <p>Please choose your preferred payment method:</p>
+
+            <div class="payment-summary">
+                <div>
+                    <span>Selected Service:</span>
+                    <span id="summaryServiceName"></span>
+                </div>
+                <div>
+                    <span>Date & Time:</span>
+                    <span id="summaryDateTime"></span>
+                </div>
+                <div>
+                    <span>Price:</span>
+                    <span id="summaryServicePrice"></span>
+                </div>
+                <div class="total">
+                    <span>Total Amount:</span>
+                    <span id="summaryTotalAmount"></span>
+                </div>
+            </div>
+
+            <div class="payment-method-buttons">
+                <button class="upi" onclick="processPayment('upi')">
+                    <i class="fas fa-qrcode"></i> Pay with UPI
+                </button>
+                <button class="card" onclick="processPayment('card')">
+                    <i class="fas fa-credit-card"></i> Pay with Card
+                </button>
+                <button class="cash" onclick="processPayment('cash')">
+                    <i class="fas fa-money-bill-alt"></i> Pay with Cash on Service
+                </button>
+            </div>
+            <p id="errorMessage" class="error-message" style="display: none;"></p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script src="theme-switcher.js"></script>
+    <script>
+        // --- Razorpay Test Key (REPLACED WITH YOUR ACTUAL TEST KEY ID) ---
+        const RAZORPAY_KEY_ID = 'rzp_test_RWvl8DwVeBn1Zi'; // మీ Razorpay టెస్ట్ Key IDని ఇక్కడ అప్‌డేట్ చేసాము!
+        // -------------------------------------------------------------
+
+        let bookingDetails = {}; // Stores details for the current booking
+
+        // Function to calculate commission based on the new logic
+        function calculateCommission(amount) {
+            let commissionPercentage = 0;
+            if (amount < 100) {
+                commissionPercentage = 0;
+            } else if (amount >= 100 && amount < 200) {
+                commissionPercentage = 8;
+            } else if (amount >= 200 && amount < 500) {
+                commissionPercentage = 12;
+            } else if (amount >= 500 && amount < 1000) {
+                commissionPercentage = 15;
+            } else { // amount >= 1000
+                commissionPercentage = 18;
+            }
+            const commissionAmount = (amount * commissionPercentage) / 100;
+            return { commissionPercentage, commissionAmount: parseFloat(commissionAmount.toFixed(2)) };
+        }
+
+        // Function to create a unique ID (simple for demo)
+        const generateUniqueId = () => '_' + Math.random().toString(36).substr(2, 9);
+
+        // Function to add a demo booking to localStorage
+        function addDemoBooking(bookingData) {
+            let demoBookings = JSON.parse(localStorage.getItem('demoBookings')) || [];
+
+            // Calculate commission for the booking
+            const { commissionPercentage, commissionAmount } = calculateCommission(bookingData.selectedServicePrice);
+
+            const newBooking = {
+                _id: generateUniqueId(),
+                salonId: bookingData.salonId,
+                user: { _id: 'demo_user_1', name: 'Demo Customer' }, // Placeholder user
+                service: {
+                    serviceId: bookingData.selectedServiceId,
+                    serviceName: bookingData.selectedServiceName,
+                    price: bookingData.selectedServicePrice
+                },
+                date: bookingData.selectedDate,
+                time: bookingData.selectedTime,
+                status: bookingData.paymentMethod === 'cash' ? 'Pending' : 'Confirmed', // Cash bookings are 'Pending' by default
+                paymentMethod: bookingData.paymentMethod,
+                amountPaid: bookingData.selectedServicePrice, // Full amount
+                commissionPercentage: commissionPercentage,
+                commissionAmount: commissionAmount,
+                netAmountToSalon: parseFloat((bookingData.selectedServicePrice - commissionAmount).toFixed(2)),
+                createdAt: new Date().toISOString()
+            };
+            demoBookings.push(newBooking);
+            localStorage.setItem('demoBookings', JSON.stringify(demoBookings));
+            return newBooking;
+        }
+
+        function displayErrorMessage(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        async function processPayment(method) {
+            displayErrorMessage(''); // Clear previous errors
+
+            // Check if bookingDetails is actually populated
+            if (!bookingDetails || !bookingDetails.selectedServiceId) {
+                displayErrorMessage("Booking details not found. Please go back and select a service from a salon.");
+                console.error("Error: bookingDetails object is empty or missing selectedServiceId.", bookingDetails);
+                return;
+            }
+
+            if (method === 'cash') {
+                // For cash payment, just confirm the booking locally
+                bookingDetails.paymentMethod = 'cash';
+                addDemoBooking(bookingDetails); // Add with 'Pending' status
+                localStorage.removeItem('tempBookingDetails'); // Clear temp data
+                alert("Booking successful! Payment to be collected at the salon.");
+                window.location.href = 'appointments.html'; // <--- appointments.html కు రీడైరెక్ట్ చేయండి
+            } else { // UPI or Card (via Razorpay)
+                bookingDetails.paymentMethod = method; // Store the chosen method
+                initiateRazorpayPayment(method); // ఎంచుకున్న పద్ధతిని initiateRazorpayPaymentకు పాస్ చేయండి
+            }
+        }
+
+        function initiateRazorpayPayment(paymentMethod) { // ఇక్కడ paymentMethod పారామీటర్‌ను స్వీకరించండి
+            // Razorpay amount is in paisa (e.g., Rs 100 = 10000)
+            const amountInPaisa = bookingDetails.selectedServicePrice * 100;
+
+            const options = {
+                key: RAZORPAY_KEY_ID,
+                amount: amountInPaisa,
+                currency: "INR",
+                name: "Book My Salon",
+                description: `Booking for ${bookingDetails.selectedServiceName}`,
+                // image: "images/salon_logo.png", // Mixed Content సమస్యను నివారించడానికి తాత్కాలికంగా తీసివేసాము
+                // మీరు మీ లోగోను చూపాలనుకుంటే, మీ సైట్ HTTPSలో నడుస్తున్నప్పుడు దీన్ని తిరిగి జోడించండి.
+
+                // ఎంచుకున్న పద్ధతి ఆధారంగా డిస్‌ప్లే బ్లాక్‌లను మరియు డిఫాల్ట్ బ్లాక్‌ను సెట్ చేయండి
+                display: {
+                    blocks: {
+                        cards: { 
+                            name: 'Cards',
+                            instruments: [
+                                { method: 'card' }
+                            ]
+                        },
+                        upi: {
+                            name: 'UPI / QR',
+                            instruments: [
+                                { method: 'upi_intent' }, // UPI యాప్‌ల ద్వారా చెల్లింపు
+                                { method: 'upi_qr' }     // QR కోడ్ ద్వారా చెల్లింపు
+                            ]
+                        },
+                        // కావాలంటే ఇతర పద్ధతులను (నెట్‌బ్యాంకింగ్, వాలెట్‌లు) కూడా ఇక్కడ చేర్చవచ్చు
+                    }
+                },
+                config: {
+                    display: {
+                        preferences: {
+                            show_default_blocks: true, // అన్ని కాన్ఫిగర్ చేయబడిన బ్లాక్‌లను చూపించు
+                            default_block: paymentMethod === 'upi' ? 'upi' : 'cards' // ఎంచుకున్న పద్ధతిని డీఫాల్ట్‌గా చూపించు
+                        }
+                    }
+                },
+                
+                handler: function (response) {
+                    // Payment successful callback
+                    if (response.razorpay_payment_id) {
+                        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+                        // Add booking to demoBookings with 'Confirmed' status
+                        addDemoBooking(bookingDetails);
+                        localStorage.removeItem('tempBookingDetails'); // Clear temp data
+                        window.location.href = 'appointments.html'; // <--- appointments.html కు రీడైరెక్ట్ చేయండి
+                    } else {
+                        displayErrorMessage("Payment failed or cancelled. Please try again.");
+                    }
+                },
+                prefill: {
+                    name: "Demo Customer", // Replace with actual user name if available
+                    email: "demo@example.com", // Replace with actual user email if available
+                    contact: "9999999999" // Replace with actual user contact if available
+                },
+                notes: {
+                    bookingId: bookingDetails.selectedServiceId, // Use service ID as a reference for now
+                    salonId: bookingDetails.salonId
+                },
+                theme: {
+                    color: "#9932CC" // Matching your accent-primary or another suitable color
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                console.error("Razorpay Payment Failed:", response.error.code, response.error.description);
+                displayErrorMessage(`Payment failed: ${response.error.description || 'Please try again.'}`);
+            });
+            rzp.open();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tempBookingDetails = localStorage.getItem('tempBookingDetails');
+            if (tempBookingDetails) {
+                try {
+                    bookingDetails = JSON.parse(tempBookingDetails);
+                    // Ensure essential fields exist after parsing
+                    if (!bookingDetails.selectedServiceId || !bookingDetails.selectedServiceName || !bookingDetails.selectedServicePrice) {
+                        displayErrorMessage("Incomplete booking details found. Please go back to select a salon and service.");
+                        console.error("Incomplete booking details:", bookingDetails);
+                        return;
+                    }
+
+                    // Update summary display
+                    document.getElementById('summaryServiceName').textContent = bookingDetails.selectedServiceName;
+                    document.getElementById('summaryDateTime').textContent = `${bookingDetails.selectedDate} at ${bookingDetails.selectedTime}`;
+                    document.getElementById('summaryServicePrice').textContent = `₹${bookingDetails.selectedServicePrice.toFixed(2)}`;
+                    document.getElementById('summaryTotalAmount').textContent = `₹${bookingDetails.selectedServicePrice.toFixed(2)}`;
+                } catch (e) {
+                    console.error("Error parsing tempBookingDetails from localStorage:", e);
+                    displayErrorMessage("Corrupted booking details found. Please go back to select a salon and service.");
+                }
+            } else {
+                displayErrorMessage("No booking details found. Please go back to select a salon and service.");
+                console.error("No tempBookingDetails found in localStorage.");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register Salon Partner | Book My Salon</title>
+    <link rel="stylesheet" href="global.css" />
+    <style>
+        /* Base styles from global.css would apply, adding specific overrides/additions here */
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 2rem;
+            background-color: var(--bg-primary); /* Ensure main has a background */
+        }
+
+        .register-container {
+            background: var(--card-bg);
+            padding: 2.5rem 3.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px var(--card-shadow);
+            max-width: 700px; /* Increased width for better service layout */
+            width: 100%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out; /* Added fade-in animation */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .register-container h2 {
+            color: var(--accent-primary);
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .register-container .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group input[type="url"],
+        .form-group textarea {
+            width: calc(100% - 22px); /* Account for padding + border */
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.2);
+            outline: none;
+        }
+
+        .phone-input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+        }
+
+        .phone-input-group .country-code {
+            padding: 1rem;
+            color: var(--text-color);
+            border-right: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            font-weight: 600;
+        }
+
+        .phone-input-group input[type="tel"] {
+            flex-grow: 1;
+            border: none; /* Override individual input border */
+            border-radius: 0 8px 8px 0;
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .validation-message {
+            min-height: 1.2em;
+            margin-top: 0.5rem;
+            font-size: 0.85em;
+            color: var(--error-color); /* Default error color */
+        }
+        .validation-message.success {
+            color: var(--success-color);
+        }
+
+        /* Map Placeholder */
+        #map {
+            margin-top: 1rem;
+            height: 120px;
+            background-color: var(--bg-secondary);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        #map:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--accent-primary);
+        }
+
+        /* Photo Input Group */
+        .photo-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.5rem;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            background-color: var(--bg-secondary);
+            text-align: center;
+        }
+        .photo-input-group p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin: 0;
+        }
+        .photo-input-group input[type="file"] {
+            border: none;
+            padding: 0;
+            background: none;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+        .photo-input-group input[type="file"]::file-selector-button {
+            background-color: var(--accent-primary);
+            color: var(--button-text-color);
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .photo-input-group input[type="file"]::file-selector-button:hover {
+            background-color: var(--accent-secondary);
+        }
+
+        /* Services Container */
+        #servicesContainer {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--bg-secondary);
+        }
+        .service-item {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        .service-item:last-child {
+            margin-bottom: 0;
+        }
+        .service-item input {
+            flex: 1;
+            padding: 0.8rem;
+            font-size: 0.95rem;
+        }
+        .service-item input.service-name {
+            flex: 2; /* Service name takes more space */
+        }
+        .service-item input.service-price,
+        .service-item input.service-cost { /* Added style for cost */
+            flex: 1;
+        }
+        .remove-service-btn {
+            background-color: var(--error-color);
+            color: var(--button-text-color);
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.3s ease;
+        }
+        .remove-service-btn:hover {
+            background-color: var(--error-dark);
+        }
+        .add-service-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--button-secondary-bg);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin-top: 1rem;
+        }
+        .add-service-btn:hover {
+            background-color: var(--accent-primary);
+            color: var(--button-text-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--accent-primary);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn:hover:not(:disabled) {
+            background-color: var(--accent-secondary);
+        }
+        .submit-btn:disabled {
+            background-color: var(--button-disabled-bg);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .login-link {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        .login-link a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .register-container {
+                padding: 2rem 1.5rem;
+            }
+            .service-item {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .service-item input {
+                width: 100%;
+            }
+            .remove-service-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <a href="frontpage.html" class="logo" id="logoLink">Book My Salon</a>
+        <div class="header-controls">
+            <div class="header-actions">
+                <button id="themeToggle" class="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="register-container">
+            <h2>Register Your Salon</h2>
+            <p class="subtitle">Join as a partner to manage your salon and appointments.</p>
+
+            <form id="salonRegisterForm">
+                <div class="form-group">
+                    <label for="salonName">Salon Name <span class="required">*</span></label>
+                    <input type="text" id="salonName" name="salonName" placeholder="e.g., The Royal Cut, Glamour Studio" required />
+                </div>
+                <div class="form-group">
+                    <label for="ownerName">Owner Name <span class="required">*</span></label>
+                    <input type="text" id="ownerName" name="ownerName" placeholder="Your Full Name" required />
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number (10 digits) <span class="required">*</span></label>
+                    <div class="phone-input-group">
+                        <span class="country-code">+91</span>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" placeholder="Enter 10-digit number" required />
+                    </div>
+                    <div class="validation-message" id="phoneValidation"></div>
+                </div>
+                <div class="form-group">
+                    <label for="address">Full Address <span class="required">*</span></label>
+                    <textarea id="address" name="address" rows="3" placeholder="Enter your salon's full address" required></textarea>
+                    <div id="map" title="Click to manually set location or enter address to auto-detect">Map Preview (Click to set location)</div>
+                    <input type="hidden" id="latitude" name="latitude" value="17.3850">
+                    <input type="hidden" id="longitude" name="longitude" value="78.4867">
+                </div>
+
+                <div class="form-group">
+                    <label>Salon Primary Photo</label>
+                    <div class="photo-input-group">
+                        <input type="file" id="salonImageFile" name="salonImageFile" accept="image/*" />
+                        <p>OR paste an image URL</p>
+                        <input type="url" id="salonImageUrl" name="salonImageUrl" placeholder="Paste Image URL here (e.g., https://example.com/salon.jpg)" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Services Offered <span class="required">*</span></label>
+                    <div id="servicesContainer">
+                        </div>
+                    <button type="button" id="addServiceBtn" class="add-service-btn">Add Another Service</button>
+                </div>
+
+                <div id="otpVerificationSection" class="form-group" style="display: none;">
+                    <label for="otpInput">Enter OTP <span class="required">*</span></label>
+                    <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" required maxlength="6" pattern="[0-9]{6}"/>
+                    <div class="validation-message" id="otpError"></div>
+                </div>
+
+                <div id="message" style="margin-top: 1rem; text-align: center;"></div>
+
+                <button type="button" class="submit-btn" id="sendOtpBtn">Register & Send OTP</button>
+                <button type="button" class="submit-btn" id="verifyAndRegisterBtn" style="display:none; margin-top: 1rem;">
+                    Verify OTP & Complete Registration
+                </button>
+
+                <p class="login-link">Already a partner? <a href="login.html">Login here</a></p>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script src="theme-switcher.js"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        const PENDING_PAYLOAD_KEY = 'salonRegistrationPayload';
+
+        const salonRegisterForm = document.getElementById('salonRegisterForm');
+        const servicesContainer = document.getElementById('servicesContainer');
+        const addServiceBtn = document.getElementById('addServiceBtn');
+        const messageDiv = document.getElementById('message');
+        const salonImageFile = document.getElementById('salonImageFile');
+        const salonImageUrl = document.getElementById('salonImageUrl');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const phoneValidationDiv = document.getElementById('phoneValidation');
+        const addressInput = document.getElementById('address');
+        const mapDiv = document.getElementById('map');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+
+        // Twilio OTP related elements
+        const otpVerificationSection = document.getElementById('otpVerificationSection');
+        const otpInput = document.getElementById('otpInput');
+        const otpError = document.getElementById('otpError');
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const verifyAndRegisterBtn = document.getElementById('verifyAndRegisterBtn');
+
+
+        // --- Logo Link Management ---
+        function updateLogoLink() {
+            const userToken = localStorage.getItem('authToken');
+            const salonToken = localStorage.getItem('salonAuthToken');
+            const logoLink = document.getElementById('logoLink');
+
+            if (logoLink) {
+                if (salonToken) {
+                    logoLink.href = 'salon-dashboard.html';
+                } else if (userToken) {
+                    logoLink.href = 'dashboard.html';
+                } else {
+                    logoLink.href = 'frontpage.html';
+                }
+            }
+        }
+
+        // Helper function to display messages in the main message div or a specific target
+        function displayMessage(text, isError = true, targetDiv = messageDiv) {
+            targetDiv.innerHTML = `<span class="validation-message ${isError ? '' : 'success'}">${text}</span>`;
+            // Clear message after 5 seconds if it's not a success message (errors persist longer if needed)
+            if (!isError) {
+                setTimeout(() => {
+                    targetDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+ 
+        // --- Phone Number Validation ---
+        phoneNumberInput.addEventListener('input', () => {
+            const rawNumber = phoneNumberInput.value.replace(/\D/g, '');
+            phoneNumberInput.value = rawNumber;
+            if (rawNumber.length === 10) {
+                displayMessage('Phone number looks good!', false, phoneValidationDiv);
+            } else if (rawNumber.length > 0 && rawNumber.length < 10) {
+                displayMessage('Phone number must be 10 digits.', true, phoneValidationDiv);
+            } else {
+                displayMessage('', false, phoneValidationDiv); // Clear message
+            }
+        });
+
+
+        // --- Service Management Logic ---
+        function addServiceInput(serviceName = '', price = '', cost = '') {
+            const serviceItem = document.createElement('div');
+            serviceItem.className = 'service-item';
+            serviceItem.innerHTML = `
+                <input type="text" class="service-name" placeholder="Service Name (e.g., Haircut, Facial)" value="${serviceName}" required />
+                <input type="number" class="service-price" placeholder="Price (INR, Min ₹50)" min="50" value="${price}" required />
+                <input type="number" class="service-cost" placeholder="Cost (INR, Min ₹80)" min="80" value="${cost}" required />
+                <button type="button" class="remove-service-btn">Remove</button>
+            `;
+            servicesContainer.appendChild(serviceItem);
+
+            serviceItem.querySelector('.remove-service-btn').addEventListener('click', () => {
+                servicesContainer.removeChild(serviceItem);
+                if (servicesContainer.children.length === 0) {
+                    addServiceInput(); // Ensure at least one service input is always present
+                }
+            });
+        }
+
+        // Initialize with one service input if none exist
+        if (servicesContainer.children.length === 0) {
+            addServiceInput();
+        }
+
+        addServiceBtn.addEventListener('click', () => addServiceInput());
+
+        // --- Geocoding (Address to Lat/Lon) - Mocked for now ---
+        async function getCoordinatesFromAddress(address) {
+            console.log("Geocoding address:", address);
+            // Mocked coordinates for Hyderabad
+            // Adding small random offsets for distinct "locations"
+            return { latitude: 17.3850 + (Math.random() - 0.5) * 0.01, longitude: 78.4867 + (Math.random() - 0.5) * 0.01 };
+        }
+
+        addressInput.addEventListener('change', async () => {
+            const address = addressInput.value.trim();
+            if (address) {
+                mapDiv.textContent = 'Fetching coordinates...';
+                const coords = await getCoordinatesFromAddress(address);
+                latitudeInput.value = coords.latitude;
+                longitudeInput.value = coords.longitude;
+                mapDiv.textContent = `Location set: Lat ${coords.latitude.toFixed(4)}, Lon ${coords.longitude.toFixed(4)}`;
+                mapDiv.classList.add('success'); // Add a success class to style it
+            } else {
+                mapDiv.textContent = 'Map Preview (Click to set location)';
+                mapDiv.classList.remove('success');
+                latitudeInput.value = '17.3850'; // Default Hyderabad coordinates
+                longitudeInput.value = '78.4867'; // Default Hyderabad coordinates
+            }
+        });
+
+        // --- Master Validation Function ---
+        function validateForm() {
+            displayMessage('', false); // Clear general messages
+            let isValid = true;
+
+            const salonName = document.getElementById('salonName').value.trim();
+            const ownerName = document.getElementById('ownerName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const address = document.getElementById('address').value.trim();
+
+            if (!salonName) {
+                displayMessage('Salon Name is required.', true);
+                document.getElementById('salonName').focus();
+                isValid = false;
+            } else if (!ownerName) {
+                displayMessage('Owner Name is required.', true);
+                document.getElementById('ownerName').focus();
+                isValid = false;
+            } else if (!phoneNumber || phoneNumber.length !== 10) {
+                displayMessage('Please enter a valid 10-digit phone number.', true);
+                document.getElementById('phoneNumber').focus();
+                isValid = false;
+            } else if (!address) {
+                displayMessage('Full Address is required.', true);
+                document.getElementById('address').focus();
+                isValid = false;
+            }
+
+            if (!isValid) return false;
+
+            const services = [];
+            let servicesValid = true;
+            servicesContainer.querySelectorAll('.service-item').forEach(item => {
+                const nameInput = item.querySelector('.service-name');
+                const priceInput = item.querySelector('.service-price');
+                const costInput = item.querySelector('.service-cost'); // Get cost input
+
+                const serviceName = nameInput.value.trim();
+                const servicePrice = parseFloat(priceInput.value);
+                const serviceCost = parseFloat(costInput.value); // Parse cost
+
+                // Clear previous error styles
+                nameInput.style.borderColor = '';
+                priceInput.style.borderColor = '';
+                costInput.style.borderColor = '';
+
+                if (!serviceName) {
+                    displayMessage('Service name is required for all services.', true);
+                    nameInput.style.borderColor = 'var(--error-color)';
+                    servicesValid = false;
+                }
+                if (isNaN(servicePrice) || servicePrice < 50) {
+                    displayMessage('Service price must be a number and at least ₹50.', true);
+                    priceInput.style.borderColor = 'var(--error-color)';
+                    servicesValid = false;
+                }
+                if (isNaN(serviceCost) || serviceCost < 80) { // Validate cost
+                    displayMessage('Service cost must be a number and at least ₹80.', true);
+                    costInput.style.borderColor = 'var(--error-color)';
+                    servicesValid = false;
+                }
+
+                if (servicesValid) { // Only push if this specific service item is valid
+                    services.push({
+                        name: serviceName,
+                        price: servicePrice,
+                        cost: serviceCost // Add cost to services array
+                    });
+                }
+            });
+
+            if (!servicesValid || services.length === 0) {
+                displayMessage('Please ensure all service details (Name, Price (Min ₹50), Cost (Min ₹80)) are entered correctly.', true);
+                return false;
+            }
+
+            return isValid && servicesValid;
+        }
+
+        // --- Send OTP Logic (triggered by "Register & Send OTP" button) ---
+        sendOtpBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                return; // Stop if form is not valid
+            }
+
+            displayMessage('Sending OTP...', false);
+            sendOtpBtn.disabled = true;
+            sendOtpBtn.textContent = 'Sending...';
+
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const fullPhoneNumber = `+91${phoneNumber}`;
+            const ownerName = document.getElementById('ownerName').value.trim();
+
+            // Gather all form data
+            const salonName = document.getElementById('salonName').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const latitude = parseFloat(latitudeInput.value);
+            const longitude = parseFloat(longitudeInput.value);
+
+            const services = [];
+            servicesContainer.querySelectorAll('.service-item').forEach(item => {
+                const nameInput = item.querySelector('.service-name');
+                const priceInput = item.querySelector('.service-price');
+                const costInput = item.querySelector('.service-cost');
+                services.push({
+                    name: nameInput.value.trim(),
+                    price: parseFloat(priceInput.value),
+                    cost: parseFloat(costInput.value)
+                });
+            });
+
+            let finalSalonImageUrl = '';
+            let imageUploadSuccessful = false;
+
+            // Handle image upload if a file is selected
+            if (salonImageFile.files.length > 0) {
+                displayMessage('Uploading image...', false);
+                const file = salonImageFile.files[0];
+                const uploadFormData = new FormData();
+                uploadFormData.append('salonImage', file);
+
+                try {
+                    const uploadResponse = await fetch(`${API_BASE_URL}/api/uploads/salon-image`, {
+                        method: 'POST',
+                        body: uploadFormData
+                    });
+                    const uploadData = await uploadResponse.json();
+
+                    if (uploadResponse.ok && uploadData.success) {
+                        finalSalonImageUrl = uploadData.imageUrl;
+                        imageUploadSuccessful = true;
+                        displayMessage('Image uploaded successfully!', false);
+                    } else {
+                        throw new Error(uploadData.message || 'Image upload failed.');
+                    }
+                } catch (uploadError) {
+                    console.error('Image Upload Error:', uploadError);
+                    displayMessage(uploadError.message || 'Failed to upload image. Please try again.', true);
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.textContent = 'Register & Send OTP';
+                    return; // Stop the registration process if image upload fails
+                }
+            }
+            // Use URL if no file was uploaded OR if file upload failed
+            if (!imageUploadSuccessful && salonImageUrl.value.trim()) {
+                finalSalonImageUrl = salonImageUrl.value.trim();
+            }
+
+            const registrationPayload = {
+                salonName,
+                ownerName,
+                phoneNumber: fullPhoneNumber,
+                address,
+                services: services,
+                salonImageUrl: finalSalonImageUrl,
+                latitude,
+                longitude
+            };
+
+            // Store payload for later verification
+            localStorage.setItem(PENDING_PAYLOAD_KEY, JSON.stringify(registrationPayload));
+            localStorage.setItem('tempPhoneNumber', fullPhoneNumber);
+            localStorage.setItem('otpMode', 'salon-signup'); // Indicate that OTP is for salon signup
+
+            try {
+                // Request OTP from the SALON-SPECIFIC auth endpoint
+                const response = await fetch(`${API_BASE_URL}/api/salon/auth/send-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phoneNumber: fullPhoneNumber,
+                        mode: 'salon-signup',
+                        fullName: ownerName // Pass ownerName for potential backend user creation
+                    })
+                });
+                const data = await response.json();
+
+                if (!response.ok) { // Not OK status (4xx or 5xx)
+                    displayMessage(data.message || 'An error occurred. Please try again.', true);
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.textContent = 'Register & Send OTP';
+                    // Handle specific actions from backend (e.g., redirect to login if already registered)
+                    if (data.action === 'redirect_to_salon_login') {
+                        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+                    }
+                    return;
+                }
+
+                // OK status (2xx)
+                if (data.success) {
+                    displayMessage('OTP sent! Please check your phone.', false);
+                    otpVerificationSection.style.display = 'block'; // Show OTP input
+                    sendOtpBtn.style.display = 'none'; // Hide Send OTP button
+                    verifyAndRegisterBtn.style.display = 'block'; // Show Verify button
+                    otpInput.focus(); // Focus on OTP input for user convenience
+                } else {
+                    // success: false, but response.ok
+                    displayMessage(data.message || 'Failed to send OTP.', true);
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.textContent = 'Register & Send OTP';
+                }
+
+            } catch (error) {
+                console.error('Salon Registration OTP Request Error:', error);
+                displayMessage(error.message || 'Error requesting OTP. Please try again.', true);
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.textContent = 'Register & Send OTP';
+            }
+        });
+
+        // --- Verify OTP & Complete Registration Logic (triggered by "Verify OTP & Complete Registration" button) ---
+        verifyAndRegisterBtn.addEventListener('click', async function(e) { // Changed to click listener
+            e.preventDefault();
+
+            const otp = otpInput.value.trim();
+            if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+                displayMessage('Please enter a valid 6-digit OTP.', true, otpError);
+                return;
+            } else {
+                displayMessage('', false, otpError); // Clear OTP error
+            }
+
+            verifyAndRegisterBtn.disabled = true;
+            verifyAndRegisterBtn.textContent = 'Verifying...';
+            displayMessage('Verifying OTP and completing registration...', false);
+
+            const fullPhoneNumber = localStorage.getItem('tempPhoneNumber');
+            const registrationPayload = JSON.parse(localStorage.getItem(PENDING_PAYLOAD_KEY));
+
+            if (!fullPhoneNumber || !registrationPayload) {
+                displayMessage('Registration data missing. Please start over.', true);
+                verifyAndRegisterBtn.disabled = false;
+                verifyAndRegisterBtn.textContent = 'Verify OTP & Complete Registration';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/salon/auth/verify-otp-and-register`, { // Use the salon-specific endpoint
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        phoneNumber: fullPhoneNumber,
+                        otp: otp,
+                        registrationData: registrationPayload // Send the full payload
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) { // Not OK status (4xx or 5xx)
+                    displayMessage(data.message || 'OTP verification failed. Please try again.', true);
+                    displayMessage(data.message || 'Invalid OTP.', true, otpError); // Specific OTP error
+                    verifyAndRegisterBtn.disabled = false;
+                    verifyAndRegisterBtn.textContent = 'Verify OTP & Complete Registration';
+                    return;
+                }
+
+                if (data.success) {
+                    displayMessage('Registration successful! Redirecting to dashboard...', false);
+                    localStorage.removeItem(PENDING_PAYLOAD_KEY); // Clear pending data
+                    localStorage.removeItem('tempPhoneNumber');
+                    localStorage.removeItem('otpMode');
+
+                    // Store salon auth token upon successful registration
+                    if (data.token) {
+                        localStorage.setItem('salonAuthToken', data.token);
+                    }
+                    if (data.salonId) {
+                        localStorage.setItem('salonId', data.salonId); // Store salon ID
+                    }
+                    if (data.salon) {
+                        localStorage.setItem('salonData', JSON.stringify(data.salon)); // Store complete salon data
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = 'salon-dashboard.html'; // Redirect to salon dashboard
+                    }, 1500);
+                } else {
+                    displayMessage(data.message || 'OTP verification failed.', true);
+                    displayMessage(data.message || 'Invalid OTP.', true, otpError); // Specific OTP error
+                    verifyAndRegisterBtn.disabled = false;
+                    verifyAndRegisterBtn.textContent = 'Verify OTP & Complete Registration';
+                }
+
+            } catch (error) {
+                console.error('OTP Verification & Registration Error:', error);
+                displayMessage(error.message || 'An unexpected error occurred during registration.', true);
+                verifyAndRegisterBtn.disabled = false;
+                verifyAndRegisterBtn.textContent = 'Verify OTP & Complete Registration';
+            }
+        });
+
+
+        // Event listeners to clear one image input if the other is used
+        salonImageFile.addEventListener('change', () => {
+            if (salonImageFile.files.length > 0) {
+                salonImageUrl.value = '';
+            }
+        });
+
+        salonImageUrl.addEventListener('input', () => {
+            if (salonImageUrl.value.trim()) {
+                salonImageFile.value = '';
+            }
+        });
+
+        // Initial setup for logo link and default map text
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLogoLink();
+            if (!addressInput.value.trim()) {
+                mapDiv.textContent = 'Map Preview (Click to set location)';
+                mapDiv.classList.remove('success');
+            } else {
+                mapDiv.textContent = `Location set: Lat ${latitudeInput.value}, Lon ${longitudeInput.value}`;
+                mapDiv.classList.add('success');
+            }
+
+            // If there's pending OTP verification from a previous attempt, restore the state
+            const otpMode = localStorage.getItem('otpMode');
+            const pendingPayload = localStorage.getItem(PENDING_PAYLOAD_KEY);
+            if (otpMode === 'salon-signup' && pendingPayload) {
+                otpVerificationSection.style.display = 'block';
+                sendOtpBtn.style.display = 'none';
+                verifyAndRegisterBtn.style.display = 'block';
+                displayMessage('Please enter the OTP to complete your registration.', false);
+            }
+        });
+    </script>
+</body>
+</html>

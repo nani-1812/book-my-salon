@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Bookings | Salon Partner</title>
+    <link rel="stylesheet" href="global.css" />
+    <style>
+        /* Your existing CSS styles go here */
+        main {
+            margin-left: 240px; 
+            transition: margin-left 0.3s ease;
+            flex: 1;
+            padding: 2rem;
+        }
+        .appointments-container {
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .filter-controls select,
+        .filter-controls input[type="date"] {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        .appointment-list {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px var(--card-shadow);
+            overflow: hidden;
+        }
+        .appointment-header, .appointment-item {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .appointment-header {
+            background: var(--bg-secondary);
+            font-weight: bold;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .appointment-item {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        .appointment-item:last-child {
+            border-bottom: none;
+        }
+        .appointment-item .status-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status-badge.pending { background-color: #ffc10733; color: #FFC107; }
+        .status-badge.confirmed { background-color: #28a74533; color: #28a745; }
+        .status-badge.completed { background-color: #6c757d33; color: #6c757d; }
+        .status-badge.cancelled { background-color: #dc354533; color: #dc3545; }
+
+        .action-buttons button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .action-buttons button:hover {
+            background-color: var(--accent-dark);
+        }
+        .action-buttons button.cancel {
+            background-color: var(--danger-color);
+        }
+        .action-buttons button.cancel:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                margin-left: 0;
+            }
+            .appointment-header, .appointment-item {
+                grid-template-columns: 1fr; /* Stack items on small screens */
+                border-bottom: 1px solid var(--border-color);
+                padding: 1rem;
+            }
+            .appointment-header { display: none; } /* Hide header on small screens */
+            .appointment-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .appointment-item > div { width: 100%; margin-bottom: 0.5rem; }
+            .appointment-item .status-badge { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <button class="toggle-btn" id="toggleBtn">&#9776;</button>
+        <a href="frontpage.html" class="logo">Book My Salon</a>
+        <div id="themeToggleContainer">
+            <button id="themeToggle" class="toggle-btn" style="position: static; margin-left: 20px;">🌙</button>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+        <ul>
+            <li data-page="salon-dashboard.html"><a href="salon-dashboard.html"><i>💼</i><span>Salon Dashboard</span></a></li>
+            <li data-page="salon-appointments.html" class="active"><a href="salon-appointments.html"><i>📅</i><span>Manage Bookings</span></a></li>
+            <li data-page="salon-services.html"><a href="salon-services.html"><i>✂️</i><span>Edit Services</span></a></li>
+            <li data-page="salon-reports.html"><a href="salon-reports.html"><i>📊</i><span>Reports</span></a></li>
+            <li data-action="logout"><a href="#"><i>🚪</i><span>Log Out</span></a></li>
+        </ul>
+    </aside>
+
+    <main>
+        <div class="appointments-container">
+            <h2>Manage Your Bookings</h2>
+
+            <div class="filter-controls">
+                <select id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <input type="date" id="dateFilter" />
+                <button onclick="applyFilters()" class="btn-primary">Apply Filters</button>
+            </div>
+
+            <div class="appointment-list">
+                <div class="appointment-header">
+                    <div>Client Name</div>
+                    <div>Service</div>
+                    <div>Date</div>
+                    <div>Time</div>
+                    <div>Status</div>
+                    <div>Actions</div>
+                </div>
+                <div id="appointmentsBody">
+                    <p style="text-align: center; padding: 2rem; color: var(--text-secondary);">Loading appointments...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Book My Salon. All rights reserved.</p>
+    </footer>
+
+    <script src="theme-switcher.js"></script>
+    <script>
+        // const SALON_API_BASE_URL = 'http://localhost:3000'; // No longer using backend API
+
+        // --- Demo Data for Bookings ---
+        // This array will hold our simulated bookings.
+        // We'll add a default "customer" for these demo bookings.
+        let demoBookings = JSON.parse(localStorage.getItem('demoBookings')) || [];
+
+        // Function to create a unique ID (simple for demo)
+        const generateUniqueId = () => '_' + Math.random().toString(36).substr(2, 9);
+
+        // Function to add a demo booking (used by payment.html or initially)
+        function addDemoBooking(bookingDetails) {
+            // Ensure this booking is for a salon (even if it's a demo salon)
+            const salonId = localStorage.getItem('salonId');
+            if (!salonId) {
+                console.error("No salonId found in localStorage. Cannot add demo booking.");
+                return;
+            }
+
+            // A placeholder user for demo purposes if not provided
+            const demoUser = { _id: 'demo_user_1', name: 'Demo Customer' };
+
+            const newBooking = {
+                _id: generateUniqueId(), // Unique ID for this booking
+                salonId: salonId, // The salon ID from localStorage
+                user: demoUser,
+                service: {
+                    serviceId: bookingDetails.selectedServiceId || generateUniqueId(),
+                    serviceName: bookingDetails.selectedServiceName,
+                    price: bookingDetails.selectedServicePrice
+                },
+                date: bookingDetails.selectedDate, // YYYY-MM-DD
+                time: bookingDetails.selectedTime, // HH:MM
+                status: 'Confirmed', // Default to 'Confirmed' for demo bookings after payment
+                createdAt: new Date().toISOString()
+            };
+            demoBookings.push(newBooking);
+            localStorage.setItem('demoBookings', JSON.stringify(demoBookings));
+            return newBooking;
+        }
+
+        // Check for any pending bookings from payment.html
+        document.addEventListener('DOMContentLoaded', () => {
+            const tempBookingDetails = localStorage.getItem('tempBookingDetails');
+            if (tempBookingDetails) {
+                const bookingData = JSON.parse(tempBookingDetails);
+                addDemoBooking(bookingData);
+                localStorage.removeItem('tempBookingDetails'); // Clear after adding
+            }
+        });
+
+        function checkSalonAuthentication() {
+            const salonToken = localStorage.getItem('salonAuthToken');
+            const salonId = localStorage.getItem('salonId');
+            if (!salonToken || !salonId) {
+                window.location.href = 'frontpage.html';
+                return false;
+            }
+            return salonId;
+        }
+
+        async function fetchAppointments(salonId, filters = {}) {
+            // Simulate fetching appointments from demoBookings array
+            const appointmentsBody = document.getElementById('appointmentsBody');
+            appointmentsBody.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">Filtering appointments...</p>';
+
+            await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+
+            let filteredAppointments = demoBookings.filter(booking => booking.salonId === salonId);
+
+            if (filters.status) {
+                filteredAppointments = filteredAppointments.filter(booking => booking.status === filters.status);
+            }
+            if (filters.date) {
+                filteredAppointments = filteredAppointments.filter(booking => booking.date === filters.date);
+            }
+            
+            renderAppointments(filteredAppointments);
+        }
+
+        function renderAppointments(appointments) {
+            const appointmentsBody = document.getElementById('appointmentsBody');
+            appointmentsBody.innerHTML = ''; // Clear previous content
+
+            if (appointments && appointments.length > 0) {
+                appointments.forEach(app => {
+                    // For demo, assuming app.date is already YYYY-MM-DD
+                    const dateString = new Date(app.date).toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+                    const item = document.createElement('div');
+                    item.classList.add('appointment-item');
+                    item.innerHTML = `
+                        <div>${app.user ? app.user.name : 'N/A'}</div>
+                        <div>${app.service ? app.service.serviceName : 'N/A'}</div>
+                        <div>${dateString}</div>
+                        <div>${app.time}</div>
+                        <div><span class="status-badge ${app.status.toLowerCase()}">${app.status}</span></div>
+                        <div class="action-buttons">
+                            ${app.status === 'Pending' ? `<button onclick="updateAppointmentStatus('${app._id}', 'Confirmed')" class="btn-primary">Confirm</button>` : ''}
+                            ${app.status === 'Confirmed' ? `<button onclick="updateAppointmentStatus('${app._id}', 'Completed')" class="btn-primary">Complete</button>` : ''}
+                            ${app.status !== 'Cancelled' && app.status !== 'Completed' ? `<button onclick="updateAppointmentStatus('${app._id}', 'Cancelled')" class="btn-primary cancel">Cancel</button>` : ''}
+                        </div>
+                    `;
+                    appointmentsBody.appendChild(item);
+                });
+            } else {
+                appointmentsBody.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No appointments found for the selected filters.</p>';
+            }
+        }
+
+        async function updateAppointmentStatus(appointmentId, newStatus) {
+            const salonId = checkSalonAuthentication();
+            if (!salonId) return;
+
+            if (!confirm(`Are you sure you want to change this appointment status to ${newStatus}?`)) {
+                return;
+            }
+
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const bookingIndex = demoBookings.findIndex(booking => booking._id === appointmentId && booking.salonId === salonId);
+
+            if (bookingIndex > -1) {
+                // Update status locally
+                demoBookings[bookingIndex].status = newStatus;
+                localStorage.setItem('demoBookings', JSON.stringify(demoBookings));
+                alert(`Appointment status updated to ${newStatus}.`);
+                applyFilters(); // Re-render the list
+            } else {
+                alert("Failed to update appointment status: Booking not found.");
+            }
+        }
+
+        function applyFilters() {
+            const salonId = checkSalonAuthentication();
+            if (!salonId) return;
+
+            const status = document.getElementById('statusFilter').value;
+            const date = document.getElementById('dateFilter').value; // YYYY-MM-DD
+
+            const filters = {};
+            if (status) filters.status = status;
+            if (date) filters.date = date; // Pass as YYYY-MM-DD for filtering
+
+            fetchAppointments(salonId, filters);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentSalonId = checkSalonAuthentication();
+            if (currentSalonId) {
+                // Check for a dummy salon ID if none is set (for first-time salon partner login simulation)
+                if (!localStorage.getItem('salonId')) {
+                    localStorage.setItem('salonId', 'demo_salon_partner_1'); // Set a dummy ID
+                    localStorage.setItem('salonName', 'Demo Salon');
+                }
+                applyFilters(); // Fetch appointments on load
+            }
+
+            // Theme/Sidebar/Logout Logic (Copied from salon-dashboard.html)
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            
+            body.setAttribute('data-theme', savedTheme);
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            
+            themeToggle.addEventListener('click', () => {
+                const newTheme = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            });
+            
+            if (window.innerWidth > 768) {
+                if (localStorage.getItem('sidebarState') === 'collapsed') sidebar.classList.add('collapsed');
+            }
+            
+            toggleBtn.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('active');
+                    document.body.classList.toggle('sidebar-active');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+                }
+            });
+
+            document.querySelectorAll('li[data-action="logout"] a').forEach(anchor => {
+                anchor.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('salonAuthToken');
+                    localStorage.removeItem('salonId');
+                    localStorage.removeItem('salonName');
+                    window.location.href = 'frontpage.html';
+                });
+            });
+            
+            const currentPage = window.location.pathname.split('/').pop() || 'salon-dashboard.html';
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                li.classList.toggle('active', li.getAttribute('data-page') === currentPage);
+            });
+        });
+    </script>
+</body>
+</html>
